@@ -1,0 +1,191 @@
+{
+  "userStories": [
+    {
+      "id": "001",
+      "title": "Import a Guide and read it in the Guide window",
+      "description": "Tracer bullet through every layer. The ImportParser reads the `!guide v1` header and free-form Sections (Talents and Rotation are kept as plain Sections for now). `/guide import` opens the ImportBox. Pasting and clicking Import stores the Guide in the account-wide library, makes it the character's Active guide, and shows an import result. `/guide` toggles the Guide window: header (title, Variant, author, updated) plus a Section list and content pane showing paragraphs, bullets and numbered lists as written. Labels live in the locale file.",
+      "status": "open",
+      "markdownFile": "docs/issues/001-import-a-guide-and-read-it-in-the-guide-window.md",
+      "acceptanceCriteria": [
+        "ImportParser rejects a missing or unknown version line, and missing title/variant/class/url, with line numbers",
+        "Free-form Sections keep their order and text",
+        "Import stores the Guide in FieldGuideDB and sets the Active guide in FieldGuideCharDB",
+        "Import result shows title, Variant and Section count",
+        "Guide window shows the header and switches Sections from the list",
+        "`/guide`, `/guide import` and `/guide help` work",
+        "Unit tests and the smoke test pass"
+      ],
+      "blockedBy": []
+    },
+    {
+      "id": "002",
+      "title": "Copy box for the Source page link",
+      "description": "A link button in the Guide window header opens the Copy box with the Source page URL selected for Ctrl+C. Bare URLs inside Section text are shown as clickable links that open the same Copy box.",
+      "status": "open",
+      "markdownFile": "docs/issues/002-copy-box-for-the-source-page-link.md",
+      "acceptanceCriteria": [
+        "Link button opens the Copy box with the full URL highlighted and focused",
+        "Esc or clicking away closes it",
+        "URLs in Section text are detected (Markup) and clickable",
+        "Tests cover URL detection; smoke test opens the Copy box"
+      ],
+      "blockedBy": [
+        "001"
+      ]
+    },
+    {
+      "id": "003",
+      "title": "Guide library: re-import, delete and choosing a Guide",
+      "description": "Guides are identified by Source page URL + Variant. Re-importing the same pair replaces the Guide in place and the import result says Updated with the old and new dates. The Guide window lists library Guides (the character's class first), lets the character pick its Active guide, and deletes a Guide after an in-addon confirm. A character without an Active guide is offered Guides of its class.",
+      "status": "open",
+      "markdownFile": "docs/issues/003-guide-library-re-import-delete-and-choosing-a-guide.md",
+      "acceptanceCriteria": [
+        "Same URL + Variant replaces, different Variant adds",
+        "Import result says Added or Updated (with dates)",
+        "Library list filters/sorts by class; picking sets the per-character Active guide",
+        "Delete asks for confirmation inside the addon (no StaticPopup) and clears Active guide references",
+        "Tests cover Library add/replace/delete/list"
+      ],
+      "blockedBy": [
+        "001"
+      ]
+    },
+    {
+      "id": "004",
+      "title": "Rotation by level",
+      "description": "The typed `## Rotation` block is parsed into level-ranged parts (`@ 1-8`, `@ 26+`) and always-shown parts (`@ AoE`, text before the first `@`). The Guide window shows the part for the character's level plus the always-shown parts, with a toggle to show all parts.",
+      "status": "open",
+      "markdownFile": "docs/issues/004-rotation-by-level.md",
+      "acceptanceCriteria": [
+        "Parser builds Rotation parts and rejects malformed `@` lines with line numbers",
+        "PartsForLevel picks the later part on overlap and always includes unranged parts",
+        "Guide window updates on PLAYER_LEVEL_UP",
+        "Show all toggle reveals every range",
+        "Unit tests and smoke test pass"
+      ],
+      "blockedBy": [
+        "001"
+      ]
+    },
+    {
+      "id": "005",
+      "title": "Leveling Path: parse, evaluate and check talent names",
+      "description": "The typed `## Talents` block is parsed into Steps with target ranks, `|` choices and `--` comments. The Talents adapter reads the live C_Traits tree into a name to rank/max map. Evaluate marks reached Steps, finds the Next talent, lists off-plan points and unknown names. The import result lists unmatched talent names when the Guide's class matches the character, and says the check is deferred otherwise. The Guide window's Talents Section shows Steps ticked and the Next talent marked.",
+      "status": "open",
+      "markdownFile": "docs/issues/005-leveling-path-parse-evaluate-and-check-talent-names.md",
+      "acceptanceCriteria": [
+        "Step syntax errors carry line numbers",
+        "Next talent = first Step not reached, regardless of level",
+        "Choice Steps are reached when any option is",
+        "Off-plan lists unplanned talents and ranks above the highest target",
+        "Unknown names reported on import (same class) and shown as ?",
+        "Name matching ignores case and extra whitespace",
+        "Unit tests cover Evaluate scenarios; smoke test uses a stubbed C_Traits"
+      ],
+      "blockedBy": [
+        "001"
+      ]
+    },
+    {
+      "id": "006",
+      "title": "Talent panel docked beside the talent window",
+      "description": "When EllesmereUI's classic talent window (EUI_ClassicTalents) or Blizzard's talent window is shown, a Talent panel docks beside it showing the next few Steps with comments, reached Steps ticked, off-plan points and unknown names. It updates when talents change.",
+      "status": "open",
+      "markdownFile": "docs/issues/006-talent-panel-docked-beside-the-talent-window.md",
+      "acceptanceCriteria": [
+        "Docks to EUI_ClassicTalents when shown, else Blizzard's talent frame",
+        "Hidden when no Active guide or the talent window closes",
+        "Updates on TRAIT_CONFIG_UPDATED / talent change events",
+        "Smoke test shows the panel next to a stub window"
+      ],
+      "blockedBy": [
+        "005"
+      ]
+    },
+    {
+      "id": "007",
+      "title": "Pin: one pinned Section plus the Next talent line",
+      "description": "Each Section header in the Guide window gets a pin button. The Pin shows the pinned Section (Rotation filtered by level) in a resizable, scrolling frame, with an optional Next talent line and a link icon. It opens and closes with its close button, a keybind and `/guide pin`. Position, size, pinned Section and visibility are saved per character.",
+      "status": "open",
+      "markdownFile": "docs/issues/007-pin-one-pinned-section-plus-the-next-talent-line.md",
+      "acceptanceCriteria": [
+        "Pinning another Section replaces the current one",
+        "Next talent line toggles independently and works with no pinned Section",
+        "Keybinds appear under Key Bindings > AddOns",
+        "State saved in FieldGuideCharDB and restored on login",
+        "Smoke test pins a Section and toggles the Pin"
+      ],
+      "blockedBy": [
+        "004",
+        "005"
+      ]
+    },
+    {
+      "id": "008",
+      "title": "Level-up talent notice",
+      "description": "On PLAYER_LEVEL_UP the addon prints one chat line naming the Next talent (and target rank), unless the Leveling Path is finished or no talent point is available.",
+      "status": "open",
+      "markdownFile": "docs/issues/008-level-up-talent-notice.md",
+      "acceptanceCriteria": [
+        "One line per level-up, using locale strings",
+        "No line when the Guide is finished or there is no Active guide",
+        "Smoke test fires PLAYER_LEVEL_UP and reads the printed line"
+      ],
+      "blockedBy": [
+        "005"
+      ]
+    },
+    {
+      "id": "009",
+      "title": "References: highlighted names with tooltips",
+      "description": "Markup tokenizes `[Name]`, `[spell:id:Name]`, `[item:Name]` and `[item:id:Name]`. Section text shows References in a highlight colour. Hovering shows the game tooltip when the References adapter can resolve it (spell IDs, items with IDs, known spells and talents by name); otherwise it stays a coloured name.",
+      "status": "open",
+      "markdownFile": "docs/issues/009-references-highlighted-names-with-tooltips.md",
+      "acceptanceCriteria": [
+        "Tokenizer handles plain text, References and URLs in one line, including brackets that are not References",
+        "Resolver chooses tooltip vs plain colour",
+        "Hover shows a GameTooltip for resolvable References only",
+        "Unit tests for Tokenize and Render; smoke test hovers a Reference"
+      ],
+      "blockedBy": [
+        "001"
+      ]
+    },
+    {
+      "id": "010",
+      "title": "wow-guide-convert skill and the Arcane Mage Solo fixture",
+      "description": "A Claude skill in the repo holds the Guide Import spec and the conversion procedure: open the Source page in Chrome, wait for render, list Variants and ask which one, extract that Variant's tabs, write `guides/<class>-<slug>-<variant>.guide.txt`, validate with a LuaJIT CLI that runs the Core ImportParser, and copy to the clipboard. The first conversion is the Mobalytics Arcane Mage Leveling Solo Variant, which becomes a test fixture.",
+      "status": "open",
+      "markdownFile": "docs/issues/010-wow-guide-convert-skill-and-the-arcane-mage-solo-fixture.md",
+      "acceptanceCriteria": [
+        "Skill linked into ~/.claude/skills",
+        "Validation CLI prints errors with line numbers and exits non-zero on failure",
+        "Arcane Mage Solo import parses with zero errors and is used as a test fixture",
+        "Import is placed on the clipboard"
+      ],
+      "blockedBy": [
+        "004",
+        "005",
+        "009"
+      ]
+    },
+    {
+      "id": "011",
+      "title": "Debug report and in-game verification",
+      "description": "`/guide debug` writes the Active guide, live talent map, Evaluate result and frame anchors into SavedVariables. The user imports the Arcane Mage fixture in the live client and checks the window, Pin, Talent panel (EllesmereUI) and level-up line; Claude reads the report after `/reload` and fixes mismatches with the stand-in.",
+      "status": "open",
+      "markdownFile": "docs/issues/011-debug-report-and-in-game-verification.md",
+      "acceptanceCriteria": [
+        "Debug report lines in FieldGuideDB.report",
+        "C_Traits talent reading confirmed in the live client",
+        "Docking to EUI_ClassicTalents confirmed",
+        "api-notes.md in the wow-forever-addon skill updated with verified facts"
+      ],
+      "blockedBy": [
+        "006",
+        "007",
+        "008"
+      ]
+    }
+  ]
+}
