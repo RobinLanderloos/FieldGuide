@@ -177,6 +177,12 @@ ok, out = slash("FIELDGUIDE", "")
 check("/guide opens the window", ok and named("FieldGuideWindow") and visible(named("FieldGuideWindow")), out)
 check("with no guide the window says how to import", shownTexts():find("/guide import", 1, true) ~= nil, shownTexts())
 
+local windowImport = named("FieldGuideWindowImportButton")
+check("the window has an Import button, even with no guide yet", windowImport and visible(windowImport))
+windowImport.scripts.OnClick(windowImport)
+check("the window's Import button opens the import box", named("FieldGuideImportBox") and visible(named("FieldGuideImportBox")))
+named("FieldGuideImportBox"):Hide()
+
 ok, out = slash("FIELDGUIDE", "import")
 local box = named("FieldGuideImportBox")
 check("/guide import shows the import box", ok and box and visible(box), out)

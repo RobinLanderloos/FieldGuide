@@ -6,7 +6,7 @@ ns.GuideWindow = GuideWindow
 
 local L = ns.L
 local LIST_W, ROW_H = 160, 22
-local frame, header, sub, link, pinButton, guidesButton, status, scroll, content, text, empty, library
+local frame, header, sub, link, pinButton, importButton, guidesButton, status, scroll, content, text, empty, library
 local buttons, selected, mode, showAll = {}, 1, "guide", false
 local allLevels
 
@@ -75,10 +75,21 @@ local function create()
   library:SetPoint("TOPLEFT", 16, -80)
   library:SetPoint("BOTTOMRIGHT", -16, 32)
 
+  importButton = CreateFrame("Button", "FieldGuideWindowImportButton", frame, "UIPanelButtonTemplate")
+  importButton:SetSize(70, 22)
+  importButton:SetPoint("RIGHT", guidesButton, "LEFT", -4, 0)
+  importButton:SetText(L.IMPORT_BUTTON)
+  importButton:SetScript("OnClick", function() ns.ImportBox.Show() end)
+
   pinButton = CreateFrame("Button", "FieldGuidePinButton", frame, "UIPanelButtonTemplate")
   pinButton:SetSize(60, 22)
-  pinButton:SetPoint("RIGHT", guidesButton, "LEFT", -4, 0)
+  pinButton:SetPoint("RIGHT", importButton, "LEFT", -4, 0)
   pinButton:SetText(L.PIN_BUTTON)
+  -- Title and subtitle stop short of the header buttons.
+  header:SetPoint("RIGHT", pinButton, "LEFT", -8, 0)
+  header:SetWordWrap(false)
+  sub:SetPoint("RIGHT", pinButton, "LEFT", -8, 0)
+  sub:SetWordWrap(false)
   pinButton:SetScript("OnClick", function()
     local guide = ns.library and ns.library:Active()
     local section = guide and guide.sections[selected]
