@@ -20,5 +20,6 @@ Game\LibraryView.lua
 Game\GuideWindow.lua
 Game\TalentPanel.lua
 Game\Pin.lua
+Game\LevelUpNotice.lua
 Game\ImportBox.lua
 Game\Slash.lua

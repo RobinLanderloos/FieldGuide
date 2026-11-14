@@ -132,3 +132,14 @@ function Display.SectionText(section, opts)
   textLines(section.lines, out)
   return table.concat(out, "\n")
 end
+
+-- The first talent point comes at this level.
+Display.FIRST_TALENT_LEVEL = 10
+
+-- The chat line on level-up, or nil when there is nothing to say.
+function Display.LevelUpNotice(section, ev, level)
+  if level < Display.FIRST_TALENT_LEVEL then return nil end
+  local step = ev and ev.checked and ev.nextIndex and section.steps[ev.nextIndex]
+  if not step then return nil end
+  return ns.L.LEVEL_UP_NOTICE:format(options(step))
+end

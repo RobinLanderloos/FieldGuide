@@ -97,3 +97,18 @@ test("the talent panel stops after the requested number of steps", function()
   local out = strip(Display.TalentPanelText(section, ev, 1))
   assert(out:find("Precision", 1, true) and not out:find("Arcane Focus", 1, true), out)
 end)
+
+test("on level-up the notice names the next talent", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0 })
+  eq(strip(Display.LevelUpNotice(section, ev, 12)), "Talent point: Precision 1/3")
+end)
+
+test("no notice below the first talent point, or when the path is done or unchecked", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 0 })
+  eq(Display.LevelUpNotice(section, ev, 9), nil, "level 9")
+  eq(Display.LevelUpNotice(section, { checked = false, reached = {}, isUnknown = {}, offPlan = {}, unknown = {} }, 20), nil, "unchecked")
+  local done = Parse(HEAD .. "## Talents\n10: Precision 1/3\n").sections[1]
+  eq(Display.LevelUpNotice(done, evaluate(done, { Precision = 1 }), 20), nil, "done")
+end)

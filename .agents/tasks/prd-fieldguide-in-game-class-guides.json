@@ -124,7 +124,7 @@
       "id": "008",
       "title": "Level-up talent notice",
       "description": "On PLAYER_LEVEL_UP the addon prints one chat line naming the Next talent (and target rank), unless the Leveling Path is finished or no talent point is available.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/008-level-up-talent-notice.md",
       "acceptanceCriteria": [
         "One line per level-up, using locale strings",

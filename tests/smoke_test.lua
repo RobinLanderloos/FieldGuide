@@ -260,6 +260,14 @@ pinLink.scripts.OnClick(pinLink)
 check("the Pin's link icon opens the copy box", visible(named("FieldGuideCopyBox")))
 named("FieldGuideCopyBox"):Hide()
 
+-- Issue 008: level-up notice.
+said = {}
+local realPrint2 = print
+_G.print = function(t) said[#said + 1] = tostring(t) end
+fire("PLAYER_LEVEL_UP", 13)
+_G.print = realPrint2
+check("level-up prints the next talent", table.concat(said, "\n"):find("Talent point:", 1, true) ~= nil, table.concat(said, "\n"))
+
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
 check("URLs in section text are shown as links", shownTexts():find("|Hfieldguideurl:https://wowhead.test/wand|h", 1, true) ~= nil, shownTexts())

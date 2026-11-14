@@ -28,6 +28,7 @@ ns.L = {
   OR = " or ",
   OFF_PLAN = "Off-plan",
   PATH_COMPLETE = "Leveling Path complete.",
+  LEVEL_UP_NOTICE = "Talent point: |cffffd100%s|r",
   TALENT_PANEL_TITLE = "FieldGuide",
   OFF_PLAN_LINE = "%s %d (%d more than the plan)",
   NEXT_TALENT = "Next talent: %s (level %s)",

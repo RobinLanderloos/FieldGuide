@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,9 +13,9 @@ On PLAYER_LEVEL_UP the addon prints one chat line naming the Next talent (and ta
 
 ## Acceptance criteria
 
-- [ ] One line per level-up, using locale strings
-- [ ] No line when the Guide is finished or there is no Active guide
-- [ ] Smoke test fires PLAYER_LEVEL_UP and reads the printed line
+- [x] One line per level-up, using locale strings
+- [x] No line when the Guide is finished or there is no Active guide
+- [x] Smoke test fires PLAYER_LEVEL_UP and reads the printed line
 
 ## Blocked by
 
