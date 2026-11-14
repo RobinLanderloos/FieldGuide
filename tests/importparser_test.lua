@@ -69,3 +69,58 @@ test("the class token is stored in upper case", function()
   local guide = Parse((HEADER:gsub("class: MAGE", "class: Mage")))
   eq(guide.class, "MAGE")
 end)
+
+-- What AI chats actually produce around and inside a Guide Import.
+test("chat text and a code fence before the version line are skipped", function()
+  local guide, errors = Parse("Here is your import:\n```text\n" .. HEADER .. "\n## Tips\nEat\n```\nNote: talent names checked.")
+  eq(errors, nil, "errors")
+  eq(guide.class, "MAGE", "class")
+  eq(#guide.sections, 1, "sections")
+  eq(table.concat(guide.sections[1].lines, "|"), "Eat", "a closing fence ends the import")
+end)
+
+test("header lines may be indented, bulleted or bold", function()
+  local guide, errors = Parse(table.concat({
+    "!guide v1", "  title: T", "- variant: V", "**class:** mage", "**url**: https://x.example/g", "* author: A",
+  }, "\n"))
+  eq(errors, nil, "errors")
+  eq(guide.title, "T", "title"); eq(guide.variant, "V", "variant"); eq(guide.class, "MAGE", "class")
+  eq(guide.url, "https://x.example/g", "url"); eq(guide.author, "A", "author")
+end)
+
+test("loose text between the header and the first section becomes a Notes section", function()
+  local guide, errors = Parse(HEADER .. "\nA short intro line.\n\n## Tips\nEat")
+  eq(errors, nil, "errors")
+  eq(guide.sections[1].title, "Notes", "implicit section")
+  eq(guide.sections[1].lines[1], "A short intro line.", "intro")
+  eq(guide.sections[2].title, "Tips", "next section")
+end)
+
+test("headings with one to three hashes, bold or a colon are sections", function()
+  local guide = Parse(HEADER .. "\n# Overview\na\n### **Gear:**\nb\n## Talents:\n10: Precision 1/3")
+  eq(guide.sections[1].title, "Overview", "one hash")
+  eq(guide.sections[2].title, "Gear", "bold, colon, three hashes")
+  eq(guide.sections[3].kind, "talents", "Talents: is still the typed section")
+end)
+
+test("talent steps may be bulleted, say Level, use an en dash or bold", function()
+  local guide, errors = Parse(HEADER .. "\n## Talents\n- 10-11: Precision 2/3\nLevel 12: Precision 3/3\n13\226\128\14714: **Deflection** 2/5\nLvl 15 : Deflection 3/5")
+  eq(errors, nil, errors and errors[1].message)
+  local steps = guide.sections[1].steps
+  eq(#steps, 4, "steps")
+  eq(steps[3].from, 13, "en dash from"); eq(steps[3].to, 14, "en dash to")
+  eq(steps[3].options[1].name, "Deflection", "bold removed")
+end)
+
+test("an error quotes the line it is about", function()
+  local _, errors = Parse(HEADER .. "\n## Talents\n10: Precision")
+  assert(errors[1].message:find("10: Precision", 1, true), errors[1].message)
+end)
+
+test("header fields and talent steps may use = instead of :", function()
+  local guide, errors = Parse("!guide v1\ntitle = T\nvariant=V\nclass = MAGE\nurl = https://x.example/g?a=b\n## Talents\n10-11 = Precision 2/3\n12= Precision 3/3")
+  eq(errors, nil, errors and errors[1].message)
+  eq(guide.title, "T", "title"); eq(guide.variant, "V", "variant")
+  eq(guide.url, "https://x.example/g?a=b", "an = inside the value stays")
+  eq(#guide.sections[1].steps, 2, "steps")
+end)

@@ -42,12 +42,12 @@ local function parseRotation(section, errors)
       if from then
         part.from, part.to = tonumber(from), tonumber(to)
         if part.to < part.from then
-          errors[#errors + 1] = { line = section.line + j, message = "The level range runs backwards." }
+          errors[#errors + 1] = { line = section.line + j, message = ImportParser.Quote("The level range runs backwards.", line) }
         end
       elseif open then
         part.from = tonumber(open)
       elseif marker:match("^%d") or marker == "" then
-        errors[#errors + 1] = { line = section.line + j, message = "Expected \"@ 10-20\", \"@ 26+\" or \"@ Label\"." }
+        errors[#errors + 1] = { line = section.line + j, message = ImportParser.Quote("Expected \"@ 10-20\", \"@ 26+\" or \"@ Label\".", line) }
       end
       parts[#parts + 1] = part
     else
@@ -69,7 +69,7 @@ local function parseTalents(section, errors)
         step.line = section.line + j
         steps[#steps + 1] = step
       else
-        errors[#errors + 1] = { line = section.line + j, message = message }
+        errors[#errors + 1] = { line = section.line + j, message = ImportParser.Quote(message, line) }
       end
     end
   end
@@ -82,32 +82,69 @@ local function fail(line, message)
   return nil, { { line = line, message = message } }
 end
 
+-- AI chats decorate their answers with Markdown; undo the common decorations.
+local function unbold(s) return (s:gsub("%*%*", ""):gsub("__", "")) end
+local function unbullet(s) return (s:gsub("^%s*[%-%*]%s+", "")) end
+
+-- Quotes the offending line in an error, shortened, so it can be found.
+function ImportParser.Quote(message, line)
+  line = trim(line)
+  if #line > 60 then line = line:sub(1, 57) .. "..." end
+  return ("%s  > %s"):format(message, line)
+end
+
+-- "## Overview", "# Overview", "### **Gear:**" -> the heading text.
+local function headingOf(line)
+  local hashes, text = line:match("^%s*(#+)%s+(.-)%s*$")
+  if not hashes or #hashes > 3 then return nil end
+  text = trim(unbold(text)):gsub("%s*:$", "")
+  if text == "" then return nil end
+  return text
+end
+
+local HEADER_KEYS = { title = true, variant = true, class = true, author = true, updated = true, url = true }
+
+-- "title: x", "  title: x", "- title: x", "**title:** x", "title = x" -> "title", "x".
+local function headerField(line)
+  local key, value = unbold(unbullet(line)):match("^%s*(%a+)%s*[:=]%s*(.-)%s*$")
+  if key and HEADER_KEYS[key:lower()] then return key:lower(), value end
+end
+
+local function isFence(line) return line:match("^%s*```") ~= nil end
+
 function ImportParser.Parse(text)
   local all = lines(text)
-  local version = trim(all[1] or ""):match("^!guide%s+v(%d+)$")
+  -- Anything before the version line (chat text, an opening code fence) is skipped.
+  local start, version
+  for i, line in ipairs(all) do
+    version = trim(unbold(line)):match("^!guide%s+v(%d+)$")
+    if version then start = i; break end
+  end
   if not version then
     return fail(1, "The first line must be \"!guide v1\".")
   end
   if tonumber(version) > ImportParser.VERSION then
-    return fail(1, ("This import is format v%s; this FieldGuide reads up to v%d. Update the addon."):format(version, ImportParser.VERSION))
+    return fail(start, ("This import is format v%s; this FieldGuide reads up to v%d. Update the addon."):format(version, ImportParser.VERSION))
   end
   local guide, errors = { sections = {} }, {}
-  local section
-  for i = 2, #all do
+  local section, implicit
+  for i = start + 1, #all do
     local line = all[i]
-    local heading = line:match("^##%s+(.-)%s*$")
+    if isFence(line) then break end -- a closing fence ends the import; notes after it are dropped
+    local heading = headingOf(line)
+    local key, value
+    if not heading and (not section or implicit) then key, value = headerField(line) end
     if heading then
-      section = { title = heading, lines = {}, line = i }
+      section, implicit = { title = heading, lines = {}, line = i }, false
       guide.sections[#guide.sections + 1] = section
+    elseif key then
+      guide[key] = value
     elseif section then
       section.lines[#section.lines + 1] = line
-    else
-      local key, value = line:match("^(%w+):%s*(.-)%s*$")
-      if key then
-        guide[key:lower()] = value
-      elseif trim(line) ~= "" then
-        errors[#errors + 1] = { line = i, message = "Expected \"key: value\" or a \"## Section\" heading." }
-      end
+    elseif trim(line) ~= "" then
+      -- Loose text after the header: keep it rather than reject the import.
+      section, implicit = { title = "Notes", lines = { line }, line = i - 1 }, true
+      guide.sections[#guide.sections + 1] = section
     end
   end
 

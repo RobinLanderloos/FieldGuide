@@ -6,6 +6,8 @@ ns.GuideWindow = GuideWindow
 
 local L = ns.L
 local LIST_W, ROW_H = 160, 22
+local LIST_BAR = 14 -- room taken from the list for its scroll bar
+local listScroll, listChild
 local frame, header, sub, link, pinButton, importButton, guidesButton, status, scroll, content, text, empty, library
 local buttons, selected, mode, showAll = {}, 1, "guide", false
 local allLevels
@@ -120,14 +122,34 @@ local function create()
   scroll:SetScript("OnSizeChanged", function(_, w)
     content:SetWidth(w); text:SetWidth(w)
   end)
+
+  -- The section list scrolls when a guide has more sections than fit. Its
+  -- scroll bar sits in the gap between the list and the section text.
+  listScroll = CreateFrame("ScrollFrame", "FieldGuideSectionScroll", frame, "UIPanelScrollFrameTemplate")
+  listScroll:SetPoint("TOPLEFT", 16, -80)
+  listScroll:SetPoint("BOTTOMLEFT", 16, 32)
+  listScroll:SetWidth(LIST_W - LIST_BAR)
+  listChild = CreateFrame("Frame", "FieldGuideSectionList", listScroll)
+  listChild:SetSize(LIST_W - LIST_BAR, 10)
+  listScroll:SetScrollChild(listChild)
+end
+
+-- Shows the list's scroll bar only when the rows don't fit.
+local function fitList(count)
+  local rows = count * ROW_H
+  listChild:SetHeight(math.max(10, rows))
+  local bar = listScroll.ScrollBar or _G["FieldGuideSectionScrollScrollBar"]
+  local fits = rows <= (listScroll:GetHeight() or 0)
+  if bar and type(bar) == "table" then bar:SetShown(not fits) end
+  if fits then listScroll:SetVerticalScroll(0) end
 end
 
 local function button(i)
   local b = buttons[i]
   if b then return b end
-  b = CreateFrame("Button", "FieldGuideSectionButton" .. i, frame)
-  b:SetSize(LIST_W, ROW_H)
-  b:SetPoint("TOPLEFT", 16, -80 - (i - 1) * ROW_H)
+  b = CreateFrame("Button", "FieldGuideSectionButton" .. i, listChild)
+  b:SetSize(LIST_W - LIST_BAR, ROW_H)
+  b:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_H)
   b:SetNormalFontObject("GameFontNormal")
   b:SetHighlightFontObject("GameFontHighlight")
   b:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
@@ -161,6 +183,7 @@ function GuideWindow.Refresh()
   pinButton:SetShown(guide and mode == "guide" or false)
   if not guide and next(ns.library.db.guides) then mode = "library" end
   scroll:SetShown(mode == "guide")
+  listScroll:SetShown(mode == "guide" and guide and true or false)
   if mode == "library" then return showLibrary() end
 
   empty:SetShown(not guide)
@@ -185,6 +208,7 @@ function GuideWindow.Refresh()
     b:Show()
     if i == selected then b:LockHighlight() else b:UnlockHighlight() end
   end
+  fitList(#guide.sections)
   local section = guide.sections[selected]
   allLevels:SetShown(section and section.kind == "rotation" or false)
   text:SetText(section and ns.Display.SectionText(section, {

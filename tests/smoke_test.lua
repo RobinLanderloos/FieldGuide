@@ -34,6 +34,8 @@ local function newWidget(parent)
     if key == "Hide" then return function(s) s.shown = false end end
     if key == "SetShown" then return function(s, v) if v then s:Show() else s:Hide() end end end
     if key == "SetSize" then return function(s, w2, h) rawset(s, "width", w2); rawset(s, "height", h) end end
+    if key == "SetHeight" then return function(s, h) rawset(s, "height", h) end end
+    if key == "SetWidth" then return function(s, w2) rawset(s, "width", w2) end end
     if key == "GetWidth" then return function(s) return rawget(s, "width") or 0 end end
     if key == "GetHeight" then return function(s) return rawget(s, "height") or 0 end end
     if key == "SetPoint" then
@@ -538,6 +540,21 @@ do
   check("Esc cancels the rename", renamed.customName == "Renamed | Guide" and not visible(nameEdit))
   renamed.customName = nil
   gb.scripts.OnClick(gb)
+end
+
+-- A guide with more sections than fit: the list scrolls instead of overflowing.
+do
+  local many = { "!guide v1\ntitle: Long Guide\nvariant: Many\nclass: WARRIOR\nurl: https://long.test" }
+  for i = 1, 30 do many[#many + 1] = ("## Part %d\ntext %d"):format(i, i) end
+  slash("FIELDGUIDE", "import")
+  named("FieldGuideImportEditBox"):SetText(table.concat(many, "\n"))
+  named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+  ns.GuideWindow.Show()
+  local list = named("FieldGuideSectionList")
+  local last = named("FieldGuideSectionButton30")
+  check("section buttons live inside the scrolling section list", last and rawget(last, "parentWidget") == list, last and tostring(rawget(last, "parentWidget")))
+  check("the scroll child is as tall as all rows", list and (rawget(list, "height") or 0) >= 30 * 22, list and rawget(list, "height"))
+  ns.library:Delete(FieldGuideCharDB.active)
 end
 
 -- A bad paste keeps the box open with the errors.

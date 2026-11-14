@@ -11,9 +11,20 @@ function LevelingPath.Normalize(name)
   return trim(name):gsub("%s+", " "):lower()
 end
 
+local EN_DASH, EM_DASH = "\226\128\147", "\226\128\148"
+
+-- Undoes what AI chats tend to add: bullets, bold, "Level"/"Lvl", dashes.
+local function tidy(line)
+  line = line:gsub("^%s*[%-%*]%s+", ""):gsub("%*%*", "")
+  line = line:gsub(EM_DASH, " -- "):gsub(EN_DASH, "-")
+  line = line:gsub("^%s*[Ll][Ee][Vv][Ee][Ll][Ss]?%s*", ""):gsub("^%s*[Ll][Vv][Ll]%.?%s*", "")
+  return line
+end
+
 -- "12-14: Improved Channeling 3/5 | Other 1/1 -- comment" -> step, or nil, message.
 function LevelingPath.ParseStep(line)
-  local levels, rest = line:match("^%s*([%d%s%-]+):%s*(.-)%s*$")
+  line = tidy(line)
+  local levels, rest = line:match("^%s*([%d%s%-]+)[:=]%s*(.-)%s*$")
   if not levels then return nil, "Expected \"level: Talent rank/max\"." end
   local from, to = levels:match("^%s*(%d+)%s*%-%s*(%d+)%s*$")
   if not from then from = levels:match("^%s*(%d+)%s*$"); to = from end
