@@ -7,3 +7,6 @@ Thumbs.db
 
 # Release builds
 dist/
+
+# Converted guides: other authors' content, kept out of the public repo
+guides/

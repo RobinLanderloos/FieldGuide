@@ -5,17 +5,17 @@ description: Convert a web class guide (Mobalytics or similar, for WoW Forever) 
 
 # Convert a web guide into a FieldGuide Guide Import
 
-The FieldGuide addon lives in `C:\Users\robin\projects\FieldGuide`. Its decisions are in `docs/adr/`, its vocabulary in `CONTEXT.md`. A worked example: `guides/mage-arcane-mage-guide-progress-arcane-leveling-solo.guide.txt`.
+The FieldGuide addon lives in `C:\Users\robin\projects\FieldGuide`. Its decisions are in `docs/adr/`, its vocabulary in `CONTEXT.md`. Converted guides are the guide authors' content reworded for the user's own use, so they are **never committed** (the repo is public): they live in `C:/Users/robin/Documents/FieldGuide guides/` (worked example: `mage-arcane-mage-guide-progress-arcane-leveling-solo.guide.txt` there). The repo's own format example is `tests/fixtures/example-warrior.guide.txt`.
 
 ## Procedure
 
 1. **Open the Source page in Chrome** (load the `chrome-browser` skill first; new tab). Mobalytics renders its content on the client, so `get_page_text` can come back empty right after navigating: wait a few seconds and read again.
 2. **Find the Variants.** Guide pages often have several (for example "Arcane Leveling Solo", "Arcane Leveling Group", "Arcane Fire Endgame"), shown as tabs above Talents, Rotation and Gear. List them and **ask the user which one to convert** (AskUserQuestion). One import holds exactly one Variant (ADR 0003). Skip the question only when the page has a single Variant or the user already named one.
 3. **Select that Variant's tab in every section** that has Variant tabs (click them, then read the text again). Shared sections (Overview, Races, Professions, Tips) are the same for all Variants.
-4. **Write the Guide Import** to `guides/<class>-<page-slug>-<variant-slug>.guide.txt` in the format below. Re-converting the same page and Variant overwrites the file, so git shows what the author changed.
-5. **Validate**: from the repo root run `luajit tools/validate.lua guides/<file>.guide.txt`. Fix every error (they come with line numbers) and run it again until it prints `OK`. Check the talent points add up: steps count up, and the totals should match the guide's "points spent".
-6. **Clipboard**: `Get-Content -Raw guides/<file>.guide.txt | Set-Clipboard` (PowerShell).
-7. **Tell the user**: in-game, `/guide import`, Ctrl+V, Import. The import result lists talent names that don't match the character's tree. If it does, fix the names in the file and repeat from step 5. Commit the guide file.
+4. **Write the Guide Import** to `C:/Users/robin/Documents/FieldGuide guides/<class>-<page-slug>-<variant-slug>.guide.txt` in the format below. Re-converting the same page and Variant overwrites the file.
+5. **Validate**: from the repo root run `luajit tools/validate.lua "C:/Users/robin/Documents/FieldGuide guides/<file>.guide.txt"`. Fix every error (they come with line numbers) and run it again until it prints `OK`. Check the talent points add up: steps count up, and the totals should match the guide's "points spent".
+6. **Clipboard**: `Get-Content -Raw "C:/Users/robin/Documents/FieldGuide guides/<file>.guide.txt" | Set-Clipboard` (PowerShell).
+7. **Tell the user**: in-game, `/guide import`, Ctrl+V, Import. The import result lists talent names that don't match the character's tree. If it does, fix the names in the file and repeat from step 5. Do not commit the guide file.
 8. Close the tabs you opened.
 
 ## Writing the content
