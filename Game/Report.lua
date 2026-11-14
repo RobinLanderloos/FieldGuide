@@ -21,7 +21,7 @@ function Report.Run()
   say(("player: %s level %s"):format(tostring(class), tostring(UnitLevel("player"))))
 
   local guide = ns.library:Active()
-  say("active: " .. (guide and (guide.title .. " - " .. guide.variant .. " (" .. guide.class .. ")") or "none"))
+  say("active: " .. (guide and (guide.title .. (guide.customName and (" [" .. guide.customName .. "]") or "") .. " - " .. guide.variant .. " (" .. guide.class .. ")") or "none"))
   local pinned = ns.library:Pinned()
   say("pinned: " .. (pinned and pinned.title or "none"))
 

@@ -5,15 +5,17 @@ local ImportBox = {}
 ns.ImportBox = ImportBox
 
 local L = ns.L
-local frame, edit, result
+local frame, edit, nameBox, result
 
 local function import()
   -- The client's edit box escapes a pasted "|" as "||"; read it back as written.
   local pasted = (edit:GetText():gsub("||", "|"))
+  local name = ((nameBox:GetText() or ""):gsub("||", "|"))
   local ok, lines = ns.ImportReport.Import(pasted, ns.library,
-    { class = ns.Talents.PlayerClass(), live = ns.Talents.Live() })
+    { class = ns.Talents.PlayerClass(), live = ns.Talents.Live() }, name)
   if ok then
     edit:SetText("")
+    nameBox:SetText("")
     result:SetText("")
     frame:Hide()
     ns.GuideWindow.Show()
@@ -68,6 +70,18 @@ local function create()
   button:SetPoint("BOTTOMRIGHT", -16, 12)
   button:SetText(L.IMPORT_BUTTON)
   button:SetScript("OnClick", import)
+
+  -- Optional display name for the guide (ADR 0003: identity stays URL + Variant).
+  nameBox = CreateFrame("EditBox", "FieldGuideImportNameBox", frame, "InputBoxTemplate")
+  nameBox:SetSize(160, 22)
+  nameBox:SetPoint("RIGHT", button, "LEFT", -12, 0)
+  nameBox:SetAutoFocus(false)
+  nameBox:SetMaxLetters(60)
+  nameBox:SetScript("OnEscapePressed", function() frame:Hide() end)
+  nameBox:SetScript("OnEnterPressed", import)
+  local nameLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+  nameLabel:SetPoint("RIGHT", nameBox, "LEFT", -8, 0)
+  nameLabel:SetText(L.IMPORT_NAME)
 
   local prompt = CreateFrame("Button", "FieldGuideImportPromptButton", frame, "UIPanelButtonTemplate")
   prompt:SetSize(120, 24)

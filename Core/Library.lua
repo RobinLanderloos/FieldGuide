@@ -17,10 +17,22 @@ function Library.New(db, char)
   return setmetatable({ db = db, char = char }, Library)
 end
 
+-- The name shown for a guide: the player's custom name, else its title.
+function Library.DisplayName(guide)
+  return guide.customName or guide.title
+end
+
 -- Returns key, "added" | "updated", previous guide (when updated).
-function Library:Add(guide)
+-- customName (optional) is a display name; blank keeps the previous one.
+function Library:Add(guide, customName)
   local key = Library.Key(guide)
   local previous = self.db.guides[key]
+  customName = customName and customName:match("^%s*(.-)%s*$")
+  if customName and customName ~= "" then
+    guide.customName = customName
+  elseif previous then
+    guide.customName = previous.customName
+  end
   self.db.guides[key] = guide
   self:setActive(key)
   return key, previous and "updated" or "added", previous
@@ -58,7 +70,8 @@ function Library:List(firstClass)
     local ga, gb = a.guide, b.guide
     local fa, fb = ga.class == firstClass, gb.class == firstClass
     if fa ~= fb then return fa end
-    if ga.title ~= gb.title then return ga.title < gb.title end
+    local na, nb = Library.DisplayName(ga), Library.DisplayName(gb)
+    if na ~= nb then return na < nb end
     return ga.variant < gb.variant
   end)
   return list

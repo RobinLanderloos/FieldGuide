@@ -171,8 +171,9 @@ function GuideWindow.Refresh()
     return
   end
   local function esc(t) return (t:gsub("|", "||")) end
-  header:SetText(esc(guide.title))
+  header:SetText(esc(ns.Library.DisplayName(guide)))
   local parts = { esc(guide.variant) }
+  if guide.customName then parts[#parts + 1] = esc(guide.title) end
   if guide.author then parts[#parts + 1] = L.BY:format(esc(guide.author)) end
   if guide.updated then parts[#parts + 1] = L.UPDATED_ON:format(guide.updated) end
   sub:SetText(table.concat(parts, "  \194\183  "))

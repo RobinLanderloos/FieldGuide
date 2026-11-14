@@ -437,6 +437,21 @@ check("guides sit under their class heading", warriorRow and top(h1) < top(mageR
   ("%s %s %s %s"):format(top(h1), top(mageRow), top(h2), top(warriorRow)))
 ns.library:Delete(warriorKey)
 
+-- A custom name can be given before saving.
+slash("FIELDGUIDE", "import")
+local nameBox = named("FieldGuideImportNameBox")
+check("the import box has a name field", nameBox and visible(nameBox))
+nameBox:SetText("My || Warrior")
+named("FieldGuideImportEditBox"):SetText("!guide v1\ntitle: A Warrior Guide\nvariant: Fury\nclass: WARRIOR\nurl: https://w.test\n## Overview\nhi")
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+local named1 = ns.library:Active()
+check("the custom name is saved (pipes read back as typed)", named1 and named1.customName == "My | Warrior", named1 and named1.customName)
+texts = shownTexts()
+check("the window header shows the custom name", texts:find("My || Warrior", 1, true) ~= nil, texts)
+check("the guide's own title is still shown", texts:find("A Warrior Guide", 1, true) ~= nil, texts)
+check("the name field is cleared after import", (nameBox.text or "") == "")
+ns.library:Delete(FieldGuideCharDB.active)
+
 -- A bad paste keeps the box open with the errors.
 slash("FIELDGUIDE", "import")
 named("FieldGuideImportEditBox"):SetText("!guide v1\ntitle: x")

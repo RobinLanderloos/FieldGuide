@@ -15,6 +15,7 @@ ns.L = {
   PROMPT_TITLE = "Prompt for any AI chat",
   PROMPT_HINT = "Ctrl+C, paste it into an AI chat, add the guide URL or text, then paste the answer into Import.",
   IMPORT_BUTTON = "Import",
+  IMPORT_NAME = "Name (optional)",
   UPDATED_ON = "updated %s",
   BY = "by %s",
   COPY_TITLE = "Copy link",

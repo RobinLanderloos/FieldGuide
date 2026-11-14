@@ -46,7 +46,7 @@ function TalentPanel.Refresh()
   local guide = ns.library and ns.library:Active()
   local ev, section = ns.Talents.Evaluate(guide)
   if not (docked and ev and ev.checked) then panel:Hide(); return end
-  title:SetText(guide.title:gsub("|", "||") .. " |cff999999- " .. guide.variant:gsub("|", "||") .. "|r")
+  title:SetText(ns.Library.DisplayName(guide):gsub("|", "||") .. " |cff999999- " .. guide.variant:gsub("|", "||") .. "|r")
   body:SetText(ns.Display.TalentPanelText(section, ev, STEPS))
   panel:SetHeight(math.max(80, 30 + title:GetHeight() + 8 + body:GetHeight() + 14))
   panel:Show()

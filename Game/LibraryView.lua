@@ -86,7 +86,7 @@ function LibraryView.Refresh(onUse)
       local r, guide, key = row(i), entry.guide, entry.key
       local active = lib:Active() == guide
       r.label:SetText(("%s%s - %s|r"):format(active and "|cffffd100" or "|cffffffff",
-        (guide.title:gsub("|", "||")), (guide.variant:gsub("|", "||"))))
+        (ns.Library.DisplayName(guide):gsub("|", "||")), (guide.variant:gsub("|", "||"))))
       r.use:SetEnabled(not active)
       r.use:SetScript("OnClick", function()
         pending = nil

@@ -32,8 +32,9 @@ local function talentLines(guide, context, lines)
 end
 
 -- context (optional): { class = player's class token, live = live talents }.
+-- customName (optional): the player's name for the guide.
 -- Returns ok, lines.
-function ImportReport.Import(text, library, context)
+function ImportReport.Import(text, library, context, customName)
   local L = ns.L
   if not text or not text:find("%S") then
     return false, { L.NOTHING_TO_IMPORT }
@@ -46,9 +47,9 @@ function ImportReport.Import(text, library, context)
     end
     return false, lines
   end
-  local _, status, previous = library:Add(guide)
+  local _, status, previous = library:Add(guide, customName)
   local lines
-  local title, variant = escape(guide.title), escape(guide.variant)
+  local title, variant = escape(ns.Library.DisplayName(guide)), escape(guide.variant)
   if status == "updated" then
     lines = { L.UPDATED:format(title, variant,
       previous.updated or "?", guide.updated or "?", #guide.sections) }
