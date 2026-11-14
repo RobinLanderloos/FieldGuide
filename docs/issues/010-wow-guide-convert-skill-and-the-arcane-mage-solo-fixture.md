@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,10 +13,10 @@ A Claude skill in the repo holds the Guide Import spec and the conversion proced
 
 ## Acceptance criteria
 
-- [ ] Skill linked into ~/.claude/skills
-- [ ] Validation CLI prints errors with line numbers and exits non-zero on failure
-- [ ] Arcane Mage Solo import parses with zero errors and is used as a test fixture
-- [ ] Import is placed on the clipboard
+- [x] Skill linked into ~/.claude/skills
+- [x] Validation CLI prints errors with line numbers and exits non-zero on failure
+- [x] Arcane Mage Solo import parses with zero errors and is used as a test fixture
+- [x] Import is placed on the clipboard
 
 ## Blocked by
 

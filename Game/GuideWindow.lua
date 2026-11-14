@@ -159,16 +159,17 @@ function GuideWindow.Refresh()
     text:SetText("")
     return
   end
-  header:SetText(guide.title)
-  local parts = { guide.variant }
-  if guide.author then parts[#parts + 1] = L.BY:format(guide.author) end
+  local function esc(t) return (t:gsub("|", "||")) end
+  header:SetText(esc(guide.title))
+  local parts = { esc(guide.variant) }
+  if guide.author then parts[#parts + 1] = L.BY:format(esc(guide.author)) end
   if guide.updated then parts[#parts + 1] = L.UPDATED_ON:format(guide.updated) end
   sub:SetText(table.concat(parts, "  \194\183  "))
 
   if selected > #guide.sections then selected = 1 end
   for i, section in ipairs(guide.sections) do
     local b = button(i)
-    b:SetText(section.title)
+    b:SetText((section.title:gsub("|", "||")))
     b:Show()
     if i == selected then b:LockHighlight() else b:UnlockHighlight() end
   end

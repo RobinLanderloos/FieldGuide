@@ -155,7 +155,7 @@
       "id": "010",
       "title": "wow-guide-convert skill and the Arcane Mage Solo fixture",
       "description": "A Claude skill in the repo holds the Guide Import spec and the conversion procedure: open the Source page in Chrome, wait for render, list Variants and ask which one, extract that Variant's tabs, write `guides/<class>-<slug>-<variant>.guide.txt`, validate with a LuaJIT CLI that runs the Core ImportParser, and copy to the clipboard. The first conversion is the Mobalytics Arcane Mage Leveling Solo Variant, which becomes a test fixture.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/010-wow-guide-convert-skill-and-the-arcane-mage-solo-fixture.md",
       "acceptanceCriteria": [
         "Skill linked into ~/.claude/skills",

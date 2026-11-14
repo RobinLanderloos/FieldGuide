@@ -5,6 +5,9 @@ local addonName, ns = ...
 local ImportReport = {}
 ns.ImportReport = ImportReport
 
+-- The game reads "|" as the start of an escape code; "||" shows one.
+local function escape(text) return (text:gsub("|", "||")) end
+
 local function talentSteps(guide)
   for _, section in ipairs(guide.sections) do
     if section.kind == "talents" then return section.steps end
@@ -24,7 +27,7 @@ local function talentLines(guide, context, lines)
   end
   local ev = ns.LevelingPath.Evaluate(steps, context.live)
   if ev.checked and #ev.unknown > 0 then
-    lines[#lines + 1] = L.UNKNOWN_TALENTS:format(table.concat(ev.unknown, ", "))
+    lines[#lines + 1] = L.UNKNOWN_TALENTS:format(escape(table.concat(ev.unknown, ", ")))
   end
 end
 
@@ -45,11 +48,12 @@ function ImportReport.Import(text, library, context)
   end
   local _, status, previous = library:Add(guide)
   local lines
+  local title, variant = escape(guide.title), escape(guide.variant)
   if status == "updated" then
-    lines = { L.UPDATED:format(guide.title, guide.variant,
+    lines = { L.UPDATED:format(title, variant,
       previous.updated or "?", guide.updated or "?", #guide.sections) }
   else
-    lines = { L.IMPORTED:format(guide.title, guide.variant, #guide.sections) }
+    lines = { L.IMPORTED:format(title, variant, #guide.sections) }
   end
   talentLines(guide, context, lines)
   return true, lines

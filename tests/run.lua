@@ -20,7 +20,7 @@ local function eq(actual, expected, what)
   end
 end
 
-for _, file in ipairs({ "tests/importparser_test.lua", "tests/library_test.lua", "tests/importreport_test.lua", "tests/markup_test.lua", "tests/rotation_test.lua", "tests/display_test.lua", "tests/levelingpath_test.lua" }) do
+for _, file in ipairs({ "tests/importparser_test.lua", "tests/library_test.lua", "tests/importreport_test.lua", "tests/markup_test.lua", "tests/rotation_test.lua", "tests/display_test.lua", "tests/levelingpath_test.lua", "tests/fixture_test.lua" }) do
   assert(loadfile(file))(ns, test, eq)
 end
 

@@ -62,3 +62,8 @@ test("a guide for another class says the talent check waits", function()
   local text = table.concat(lines, "\n")
   assert(text:find("MAGE", 1, true) and not text:find("Wand Specialisation", 1, true), text)
 end)
+
+test("pipes in the title are escaped so the game shows them", function()
+  local _, lines = ImportReport.Import((GOOD:gsub("title: Arcane Mage", "title: Arcane Mage | <Progress>")), ns.Library.New({}, {}))
+  assert(lines[1]:find("Arcane Mage || <Progress>", 1, true), lines[1])
+end)

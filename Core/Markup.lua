@@ -33,6 +33,14 @@ end
 -- Returns runs: { kind = "text" | "url" | "ref", text = ... }; references
 -- also carry refKind (nil, "spell", "item", "talent"), id and name.
 function Markup.Tokenize(line)
+  -- `literal` spans: shown as written, nothing inside is a link.
+  local ls, le = line:find("`[^`]+`")
+  if ls then
+    local runs = Markup.Tokenize(line:sub(1, ls - 1))
+    push(runs, "text", line:sub(ls + 1, le - 1))
+    for _, run in ipairs(Markup.Tokenize(line:sub(le + 1))) do runs[#runs + 1] = run end
+    return runs
+  end
   local runs, pos = {}, 1
   while pos <= #line do
     local us, ue = line:find(URL_PATTERN, pos)

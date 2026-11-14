@@ -291,6 +291,26 @@ check("a talent named without an ID resolves through the talent tree", hover("fi
 check("an unresolved reference shows no tooltip", hover("fieldguideref:::Unknown Thing") == nil, tooltipShown)
 check("the Pin handles references too", named("FieldGuidePinContent").scripts.OnHyperlinkEnter ~= nil)
 
+-- Issue 010: the real converted guide imports.
+do
+  local f = assert(io.open("guides/mage-arcane-mage-guide-progress-arcane-leveling-solo.guide.txt", "rb"))
+  local fixture = f:read("*a"); f:close()
+  slash("FIELDGUIDE", "import")
+  named("FieldGuideImportEditBox"):SetText(fixture)
+  named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+  local t = shownTexts()
+  check("the Arcane Mage Solo guide imports", t:find("Imported Arcane Mage Guide || <Progress> Avoid", 1, true) ~= nil, t)
+  check("the window header escapes the pipe in the title", t:find("Arcane Mage Guide || <Progress> Avoid", 1, true) ~= nil)
+  -- remove it again and go back to the smoke guide for the checks below
+  ns.library:Delete(ns.library.char.active)
+  for key, g in pairs(FieldGuideDB.guides) do
+    if g.variant == "Arcane Leveling Solo" and g.url == "https://example.test/arcane" then
+      ns.library:SetActive(key)
+    end
+  end
+  ns.GuideWindow.Refresh()
+end
+
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
 check("URLs in section text are shown as links", shownTexts():find("|Hfieldguideurl:https://wowhead.test/wand|h", 1, true) ~= nil, shownTexts())
