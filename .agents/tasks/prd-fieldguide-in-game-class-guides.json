@@ -4,7 +4,7 @@
       "id": "001",
       "title": "Import a Guide and read it in the Guide window",
       "description": "Tracer bullet through every layer. The ImportParser reads the `!guide v1` header and free-form Sections (Talents and Rotation are kept as plain Sections for now). `/guide import` opens the ImportBox. Pasting and clicking Import stores the Guide in the account-wide library, makes it the character's Active guide, and shows an import result. `/guide` toggles the Guide window: header (title, Variant, author, updated) plus a Section list and content pane showing paragraphs, bullets and numbered lists as written. Labels live in the locale file.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/001-import-a-guide-and-read-it-in-the-guide-window.md",
       "acceptanceCriteria": [
         "ImportParser rejects a missing or unknown version line, and missing title/variant/class/url, with line numbers",

@@ -1,0 +1,187 @@
+-- Load check: runs every file the .toc lists, in order, against a small
+-- stand-in for the game. Catches missing files, syntax errors and nil calls
+-- before logging in; it does not prove the real client behaves the same.
+--   luajit tests/smoke_test.lua
+local ADDON = "FieldGuide"
+
+local files = {}
+for line in io.lines(ADDON .. ".toc") do
+  line = line:gsub("%s+$", "")
+  if line ~= "" and not line:match("^#") then files[#files + 1] = (line:gsub("\\", "/")) end
+end
+
+-- Widgets: remember scripts, events, text, attributes, size, anchor and
+-- shown state; Create* calls give child widgets. Like real frames, unknown
+-- methods (capitalised) do nothing and unset fields are nil.
+local widgets = {}
+local function newWidget(parent)
+  local w = { shown = true, scripts = {}, events = {}, parentWidget = parent }
+  widgets[#widgets + 1] = w
+  return setmetatable(w, { __index = function(self, key)
+    if key == "Text" or key == "TitleText" then
+      local child = newWidget(self); rawset(self, key, child); return child
+    end
+    if key == "SetScript" then return function(s, name, fn) s.scripts[name] = fn end end
+    if key == "RegisterEvent" or key == "RegisterUnitEvent" then return function(s, name) s.events[name] = true end end
+    if key == "UnregisterEvent" then return function(s, name) s.events[name] = nil end end
+    if key == "SetText" then return function(s, text) rawset(s, "text", text) end end
+    if key == "GetText" then return function(s) return rawget(s, "text") end end
+    if key == "SetAttribute" then
+      return function(s, name, v) rawset(s, "attrs", rawget(s, "attrs") or {}); s.attrs[name] = v end
+    end
+    if key == "IsShown" then return function(s) return s.shown end end
+    if key == "Show" then return function(s) s.shown = true; if s.scripts.OnShow then s.scripts.OnShow(s) end end end
+    if key == "Hide" then return function(s) s.shown = false end end
+    if key == "SetShown" then return function(s, v) if v then s:Show() else s:Hide() end end end
+    if key == "SetSize" then return function(s, w2, h) rawset(s, "width", w2); rawset(s, "height", h) end end
+    if key == "GetWidth" then return function(s) return rawget(s, "width") or 0 end end
+    if key == "GetHeight" then return function(s) return rawget(s, "height") or 0 end end
+    if key == "SetPoint" then
+      return function(s, ...) if not rawget(s, "point") then rawset(s, "point", { ... }) end end
+    end
+    if key == "ClearAllPoints" then return function(s) rawset(s, "point", nil) end end
+    if type(key) == "string" and key:match("^Create") then return function(s) return newWidget(s) end end
+    if type(key) == "string" and key:match("^%u") then return function() end end
+    return nil
+  end })
+end
+
+local function fire(event, ...)
+  for _, w in ipairs(widgets) do
+    if w.events[event] and w.scripts.OnEvent then w.scripts.OnEvent(w, event, ...) end
+  end
+end
+
+-- Shown only when it and every parent are shown, as in the game.
+local function visible(w)
+  while w do
+    if not rawget(w, "shown") then return false end
+    w = rawget(w, "parentWidget")
+  end
+  return true
+end
+
+local function shownTexts()
+  local texts = {}
+  for _, w in ipairs(widgets) do
+    local text = rawget(w, "text")
+    if visible(w) and type(text) == "string" then texts[#texts + 1] = text end
+  end
+  return table.concat(texts, "\n")
+end
+
+local function find(predicate)
+  for _, w in ipairs(widgets) do if predicate(w) then return w end end
+end
+
+-- Timers wait until the test runs them, as the game would on later frames.
+local timers = {}
+local function runTimers()
+  local guard = 0
+  while #timers > 0 and guard < 100000 do
+    table.remove(timers, 1)()
+    guard = guard + 1
+  end
+end
+
+-- The game globals the addon touches. Add what your files need.
+_G.CreateFrame = function(_, name, parent)
+  local w = newWidget(parent)
+  rawset(w, "name", name)
+  return w
+end
+_G.UIParent = newWidget()
+_G.GameTooltip = newWidget()
+_G.UISpecialFrames = {}
+_G.tinsert = table.insert
+_G.C_Timer = { After = function(_, fn) timers[#timers + 1] = fn end }
+_G.InCombatLockdown = function() return false end
+_G.SlashCmdList = {}
+_G.GetBuildInfo = function() return "1.60.1", "70938", "Nov 1 2026", 16001 end
+_G.time = function() return 1763100000 end
+_G.Settings = {
+  RegisterCanvasLayoutCategory = function() return newWidget() end,
+  RegisterAddOnCategory = function() end,
+  OpenToCategory = function() end,
+}
+_G.FieldGuideDB = nil
+_G.FieldGuideCharDB = nil
+_G.UnitClass = function() return "Mage", "MAGE", 8 end
+_G.UnitLevel = function() return 12 end
+
+-- Load the addon like the client does.
+local ns = {}
+for _, file in ipairs(files) do
+  local chunk, err = loadfile(file)
+  if not chunk then error("the .toc lists a file that does not load: " .. tostring(err)) end
+  chunk(ADDON, ns)
+end
+fire("ADDON_LOADED", ADDON)
+fire("PLAYER_LOGIN")
+
+local failed = 0
+local function check(name, condition, detail)
+  if not condition then
+    failed = failed + 1
+    print("FAIL  " .. name .. (detail and ("\n      " .. tostring(detail)) or ""))
+  end
+end
+
+-- Capture chat output of slash commands.
+local said = {}
+local realPrint = print
+local function slash(command, message)
+  said = {}
+  _G.print = function(text) said[#said + 1] = tostring(text) end
+  local ok, err = pcall(SlashCmdList[command], message)
+  _G.print = realPrint
+  return ok, ok and table.concat(said, "\n") or tostring(err)
+end
+
+local function named(name) return find(function(w) return rawget(w, "name") == name end) end
+
+local ok, out = slash("FIELDGUIDE", "help")
+check("/guide help lists the commands", ok and out:find("/guide import", 1, true) ~= nil, out)
+
+ok, out = slash("FIELDGUIDE", "")
+check("/guide opens the window", ok and named("FieldGuideWindow") and visible(named("FieldGuideWindow")), out)
+check("with no guide the window says how to import", shownTexts():find("/guide import", 1, true) ~= nil, shownTexts())
+
+ok, out = slash("FIELDGUIDE", "import")
+local box = named("FieldGuideImportBox")
+check("/guide import shows the import box", ok and box and visible(box), out)
+
+local GOOD = table.concat({
+  "!guide v1", "title: Arcane Mage Guide", "variant: Arcane Leveling Solo", "class: MAGE",
+  "author: <Progress> Avoid", "updated: 2026-11-14", "url: https://example.test/arcane",
+  "## Overview", "Arcane is fast.", "- Keep Arcane Intellect up",
+  "## Tips", "1. Get a wand",
+}, "\n")
+named("FieldGuideImportEditBox"):SetText(GOOD)
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+check("import reports success", shownTexts():find("Imported Arcane Mage Guide", 1, true) ~= nil, shownTexts())
+check("the guide is saved account-wide", FieldGuideDB and FieldGuideDB.guides and next(FieldGuideDB.guides) ~= nil)
+check("the guide is active for this character", FieldGuideCharDB and FieldGuideCharDB.active ~= nil)
+
+local texts = shownTexts()
+check("the window header shows title, variant and author",
+  texts:find("Arcane Mage Guide", 1, true) and texts:find("Arcane Leveling Solo", 1, true) and texts:find("Avoid", 1, true), texts)
+check("the first section is shown", texts:find("Arcane is fast.", 1, true) ~= nil, texts)
+
+local tipsButton = named("FieldGuideSectionButton2")
+check("each section gets a list button", tipsButton and tipsButton.text == "Tips", tipsButton and tipsButton.text)
+if tipsButton then tipsButton.scripts.OnClick(tipsButton) end
+texts = shownTexts()
+check("clicking a section shows its text", texts:find("1. Get a wand", 1, true) and not texts:find("Arcane is fast.", 1, true), texts)
+
+-- A bad paste keeps the box open with the errors.
+slash("FIELDGUIDE", "import")
+named("FieldGuideImportEditBox"):SetText("!guide v1\ntitle: x")
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+check("a bad import lists its errors", shownTexts():find("Line 1", 1, true) ~= nil, shownTexts())
+
+ok, out = slash("FIELDGUIDE", "")
+check("/guide toggles the window closed", ok and not visible(named("FieldGuideWindow")), out)
+
+io.write(failed == 0 and "load check passed\n" or (failed .. " load checks failed\n"))
+os.exit(failed == 0 and 0 or 1)

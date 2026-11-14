@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,13 +13,13 @@ Tracer bullet through every layer. The ImportParser reads the `!guide v1` header
 
 ## Acceptance criteria
 
-- [ ] ImportParser rejects a missing or unknown version line, and missing title/variant/class/url, with line numbers
-- [ ] Free-form Sections keep their order and text
-- [ ] Import stores the Guide in FieldGuideDB and sets the Active guide in FieldGuideCharDB
-- [ ] Import result shows title, Variant and Section count
-- [ ] Guide window shows the header and switches Sections from the list
-- [ ] `/guide`, `/guide import` and `/guide help` work
-- [ ] Unit tests and the smoke test pass
+- [x] ImportParser rejects a missing or unknown version line, and missing title/variant/class/url, with line numbers
+- [x] Free-form Sections keep their order and text
+- [x] Import stores the Guide in FieldGuideDB and sets the Active guide in FieldGuideCharDB
+- [x] Import result shows title, Variant and Section count
+- [x] Guide window shows the header and switches Sections from the list
+- [x] `/guide`, `/guide import` and `/guide help` work
+- [x] Unit tests and the smoke test pass
 
 ## Blocked by
 

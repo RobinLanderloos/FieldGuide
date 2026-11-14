@@ -1,0 +1,15 @@
+## Interface: 16001
+## Title: FieldGuide
+## Notes: Class guides in-game: sections, talent plan and rotation, imported from text.
+## Version: 0.1.0
+## SavedVariables: FieldGuideDB
+## SavedVariablesPerCharacter: FieldGuideCharDB
+
+Locales\enUS.lua
+Core\ImportParser.lua
+Core\Library.lua
+Core\ImportReport.lua
+Game\Main.lua
+Game\GuideWindow.lua
+Game\ImportBox.lua
+Game\Slash.lua
