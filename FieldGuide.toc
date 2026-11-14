@@ -23,4 +23,5 @@ Game\TalentPanel.lua
 Game\Pin.lua
 Game\LevelUpNotice.lua
 Game\ImportBox.lua
+Game\Report.lua
 Game\Slash.lua

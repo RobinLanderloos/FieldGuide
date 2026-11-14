@@ -41,10 +41,12 @@ ns.L = {
   PIN_NEXT_OFF = "|cff808080Next|r",
   BINDING_TOGGLE_PIN = "Show or hide the Pin",
   BINDING_TOGGLE_WINDOW = "Show or hide the guide window",
+  DEBUG_DONE = "Report saved; /reload to write it to disk.",
   HELP = {
     "/guide - show or hide the guide window",
     "/guide import - paste a Guide Import",
     "/guide pin - show or hide the Pin",
+    "/guide debug - save a diagnostic report",
     "/guide help - this list",
   },
 }

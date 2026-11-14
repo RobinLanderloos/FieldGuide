@@ -101,6 +101,7 @@ _G.InCombatLockdown = function() return false end
 _G.SlashCmdList = {}
 _G.GetBuildInfo = function() return "1.60.1", "70938", "Nov 1 2026", 16001 end
 _G.time = function() return 1763100000 end
+_G.date = function() return "2026-11-14 12:00" end
 _G.Settings = {
   RegisterCanvasLayoutCategory = function() return newWidget() end,
   RegisterAddOnCategory = function() end,
@@ -310,6 +311,14 @@ do
   end
   ns.GuideWindow.Refresh()
 end
+
+-- Issue 011: /guide debug writes a report into the saved variables.
+ok, out = slash("FIELDGUIDE", "debug")
+check("/guide debug runs", ok, out)
+local report = FieldGuideDB.report and table.concat(FieldGuideDB.report, "\n") or ""
+check("the report names the active guide", report:find("active: Arcane Mage Guide", 1, true) ~= nil, report)
+check("the report lists live talents", report:find("Improved Channeling 1/5", 1, true) ~= nil, report)
+check("the report gives the next talent", report:find("next:", 1, true) ~= nil, report)
 
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
