@@ -11,6 +11,9 @@ SlashCmdList.FIELDGUIDE = function(message)
   elseif command == "debug" then
     ns.Report.Run()
     say(ns.L.DEBUG_DONE)
+  elseif command == "glow" then
+    ns.Glow.SetEnabled(not ns.Glow.Enabled())
+    say(ns.Glow.Enabled() and ns.L.GLOW_ON or ns.L.GLOW_OFF)
   elseif command == "pin" then
     ns.Pin.Toggle()
   elseif command == "import" then

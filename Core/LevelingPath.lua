@@ -71,3 +71,16 @@ function LevelingPath.Evaluate(steps, live)
   table.sort(result.offPlan, function(a, b) return a.name < b.name end)
   return result
 end
+
+-- The talent nodes to highlight: every known option of the next step that is
+-- not yet at its target (a choice highlights each option).
+function LevelingPath.NextNodes(steps, ev, live)
+  local nodes = {}
+  local step = ev and ev.checked and ev.nextIndex and steps[ev.nextIndex]
+  if not (step and live) then return nodes end
+  for _, option in ipairs(step.options) do
+    local talent = live[LevelingPath.Normalize(option.name)]
+    if talent and talent.nodeID and talent.rank < option.rank then nodes[#nodes + 1] = talent.nodeID end
+  end
+  return nodes
+end

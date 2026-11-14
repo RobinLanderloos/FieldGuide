@@ -140,7 +140,7 @@ Free text with [Arcane Blast] and [item:Lesser Magic Wand] references.
 
 ## Out of Scope
 
-- Highlighting or glowing talent nodes inside a talent window.
+- ~~Highlighting or glowing talent nodes inside a talent window.~~ Added later, see ADR 0007.
 - Spending talent points automatically.
 - More than one Pin at a time.
 - An in-game pass that learns spell/item IDs over time.

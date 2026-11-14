@@ -343,6 +343,46 @@ check("the AI prompt box holds the prompt", promptEdit and promptEdit.text == ns
 promptBox:Hide()
 named("FieldGuideImportBox"):Hide()
 
+-- Talent node glow: EllesmereUI's classic window and Blizzard's.
+do
+  local function glowing(b) local g = ns.Glow.OverlayFor(b); return g and visible(g) or false end
+  local w = named("FieldGuideTalentWatcher")
+  local eb = {}
+  for nodeID = 1, 3 do
+    eb[nodeID] = CreateFrame("Button", nil, EUI_ClassicTalents); eb[nodeID].nodeID = nodeID
+  end
+  EUI_ClassicTalents.talents = eb
+  EUI_ClassicTalents:Show()
+  w.scripts.OnUpdate(w, 1)
+  check("the next talent glows in EllesmereUI's window", glowing(eb[2]) and not glowing(eb[1]) and not glowing(eb[3]))
+  talentNodes[2].rank = 3
+  fire("TRAIT_CONFIG_UPDATED", 7)
+  w.scripts.OnUpdate(w, 1)
+  check("the glow moves off once the step is reached", not glowing(eb[2]))
+  talentNodes[2].rank = 1
+  fire("TRAIT_CONFIG_UPDATED", 7)
+  EUI_ClassicTalents:Hide()
+  w.scripts.OnUpdate(w, 1)
+  check("the glow goes away with the window", not glowing(eb[2]))
+
+  local bb = {}
+  _G.PlayerSpellsFrame = CreateFrame("Frame", "PlayerSpellsFrame", UIParent)
+  PlayerSpellsFrame.TalentsFrame = CreateFrame("Frame", nil, PlayerSpellsFrame)
+  PlayerSpellsFrame.TalentsFrame.GetTalentButtonByNodeID = function(_, nodeID)
+    bb[nodeID] = bb[nodeID] or CreateFrame("Button", nil, PlayerSpellsFrame.TalentsFrame)
+    return bb[nodeID]
+  end
+  PlayerSpellsFrame:Show()
+  w.scripts.OnUpdate(w, 1)
+  check("the next talent glows in Blizzard's talent window", bb[2] and glowing(bb[2]))
+  slash("FIELDGUIDE", "glow")
+  w.scripts.OnUpdate(w, 1)
+  check("/guide glow turns the glow off", not glowing(bb[2]) and FieldGuideDB.glow == false)
+  slash("FIELDGUIDE", "glow")
+  PlayerSpellsFrame:Hide()
+  w.scripts.OnUpdate(w, 1)
+end
+
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
 check("URLs in section text are shown as links", shownTexts():find("|Hfieldguideurl:https://wowhead.test/wand|h", 1, true) ~= nil, shownTexts())

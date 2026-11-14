@@ -95,3 +95,34 @@ test("without a live tree (another class) nothing is checked", function()
   local r = LevelingPath.Evaluate(steps(PATH), nil)
   eq(r.checked, false, "checked"); eq(r.nextIndex, nil, "next"); eq(#r.unknown, 0, "unknown")
 end)
+
+local function liveWithNodes(list)
+  local out = {}
+  for name, t in pairs(list) do
+    out[LevelingPath.Normalize(name)] = { name = name, rank = t[1], max = 5, nodeID = t[2] }
+  end
+  return out
+end
+
+test("the next step's talent nodes are the ones to glow", function()
+  local live = liveWithNodes({ ["Wand Specialization"] = { 2, 11 }, ["Improved Channeling"] = { 1, 12 }, ["Missile Barrage"] = { 0, 13 } })
+  local s = steps(PATH)
+  local nodes = LevelingPath.NextNodes(s, LevelingPath.Evaluate(s, live), live)
+  eq(#nodes, 1, "count"); eq(nodes[1], 12, "node")
+end)
+
+test("both options of a choice step glow, unless one of them is unknown", function()
+  local s = steps(HEAD .. "## Talents\n59-60: Improved Fire Blast 2/2 | Improved Counterspell 2/2 | Nonsense 1/1\n")
+  local live = liveWithNodes({ ["Improved Fire Blast"] = { 0, 21 }, ["Improved Counterspell"] = { 0, 22 } })
+  local nodes = LevelingPath.NextNodes(s, LevelingPath.Evaluate(s, live), live)
+  table.sort(nodes)
+  eq(table.concat(nodes, ","), "21,22")
+end)
+
+test("nothing glows when the path is complete or unchecked", function()
+  local s = steps(PATH)
+  eq(#LevelingPath.NextNodes(s, LevelingPath.Evaluate(s, nil), nil), 0, "unchecked")
+  local live = liveWithNodes({ ["Wand Specialization"] = { 2, 11 } })
+  local one = steps(HEAD .. "## Talents\n10: Wand Specialization 2/2\n")
+  eq(#LevelingPath.NextNodes(one, LevelingPath.Evaluate(one, live), live), 0, "complete")
+end)

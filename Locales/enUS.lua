@@ -48,10 +48,13 @@ ns.L = {
   BINDING_TOGGLE_PIN = "Show or hide the Pin",
   BINDING_TOGGLE_WINDOW = "Show or hide the guide window",
   DEBUG_DONE = "Report saved; /reload to write it to disk.",
+  GLOW_ON = "Talent glow on.",
+  GLOW_OFF = "Talent glow off.",
   HELP = {
     "/guide - show or hide the guide window",
     "/guide import - paste a Guide Import",
     "/guide pin - show or hide the Pin",
+    "/guide glow - turn the next-talent glow on or off",
     "/guide debug - save a diagnostic report",
     "/guide help - this list",
   },

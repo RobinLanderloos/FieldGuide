@@ -20,6 +20,7 @@ Game\CopyBox.lua
 Game\References.lua
 Game\LibraryView.lua
 Game\GuideWindow.lua
+Game\Glow.lua
 Game\TalentPanel.lua
 Game\Pin.lua
 Game\LevelUpNotice.lua

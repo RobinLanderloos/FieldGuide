@@ -49,6 +49,15 @@ function Report.Run()
     say("off-plan: " .. table.concat(off, ", "))
   end
 
+  ns.Glow.Update()
+  local last = ns.Glow.last
+  say(("glow: %s, %s"):format(ns.Glow.Enabled() and "on" or "off",
+    last and (last.provider .. " window, " .. last.buttons .. " button(s) lit") or "no talent window open or nothing to light"))
+  local spells = _G.PlayerSpellsFrame
+  say("blizzard TalentsFrame.GetTalentButtonByNodeID: " .. tostring(spells and spells.TalentsFrame and type(spells.TalentsFrame.GetTalentButtonByNodeID)))
+  local eui = _G.EUI_ClassicTalents
+  say("EUI_ClassicTalents.talents: " .. (eui and type(eui.talents) == "table" and (#eui.talents .. " buttons") or "missing"))
+
   for _, name in ipairs({ "EUI_ClassicTalents", "PlayerSpellsFrame", "ClassTalentFrame", "PlayerTalentFrame",
     "FieldGuideTalentPanel", "FieldGuidePin", "FieldGuideWindow" }) do
     local f = _G[name]

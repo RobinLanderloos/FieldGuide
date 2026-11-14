@@ -74,6 +74,7 @@ watcher:SetScript("OnUpdate", function(_, dt)
   if elapsed < 0.25 then return end
   elapsed = 0
   dock()
+  ns.Glow.Update()
 end)
 
 ns.Talents.OnChange(function() dirty = true end)
