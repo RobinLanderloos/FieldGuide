@@ -127,6 +127,12 @@ _G.C_Traits = {
 _G.C_Spell = { GetSpellName = function(spellID)
   for _, n in pairs(talentNodes) do if n.spellID == spellID then return n.name end end
 end }
+local tooltipShown
+_G.GameTooltip.SetSpellByID = function(_, id) tooltipShown = "spell:" .. id end
+_G.GameTooltip.SetItemByID = function(_, id) tooltipShown = "item:" .. id end
+_G.GameTooltip.SetHyperlink = function(_, link) tooltipShown = link end
+_G.C_Spell.GetSpellInfo = function() return nil end
+_G.C_Item = { GetItemInfo = function() return nil end }
 _G.FieldGuideDB = nil
 _G.FieldGuideCharDB = nil
 _G.UnitClass = function() return "Mage", "MAGE", 8 end
@@ -177,7 +183,7 @@ check("/guide import shows the import box", ok and box and visible(box), out)
 local GOOD = table.concat({
   "!guide v1", "title: Arcane Mage Guide", "variant: Arcane Leveling Solo", "class: MAGE",
   "author: <Progress> Avoid", "updated: 2026-11-14", "url: https://example.test/arcane",
-  "## Overview", "Arcane is fast.", "- Keep Arcane Intellect up",
+  "## Overview", "Arcane is fast. Cast [Improved Channeling] and [spell:30451:Arcane Blast], wand [item:11287:Lesser Magic Wand], not [Unknown Thing].", "- Keep Arcane Intellect up",
   "## Tips", "1. Get a wand", "See https://wowhead.test/wand",
   "## Talents", "10-11: Wand Specialization 2/2 -- wanding", "12-14: Improved Channeling 3/5", "15: Missile Barage 1/1",
   "## Rotation", "Keep buffs up.", "@ 1-8", "1. Fireball", "@ 8-20", "1. Arcane Missiles", "@ AoE", "1. Arcane Explosion",
@@ -267,6 +273,23 @@ _G.print = function(t) said[#said + 1] = tostring(t) end
 fire("PLAYER_LEVEL_UP", 13)
 _G.print = realPrint2
 check("level-up prints the next talent", table.concat(said, "\n"):find("Talent point:", 1, true) ~= nil, table.concat(said, "\n"))
+
+-- Issue 009: references.
+local overviewButton = named("FieldGuideSectionButton1")
+overviewButton.scripts.OnClick(overviewButton)
+texts = shownTexts()
+check("references are shown as coloured names", texts:find("|hArcane Blast|h", 1, true) and not texts:find("[spell:", 1, true), texts)
+local cf = named("FieldGuideContent")
+local function hover(link)
+  tooltipShown = nil
+  cf.scripts.OnHyperlinkEnter(cf, link, "x")
+  return tooltipShown
+end
+check("a spell reference with an ID shows its tooltip", hover("fieldguideref:spell:30451:Arcane Blast") == "spell:30451", tooltipShown)
+check("an item reference with an ID shows its tooltip", hover("fieldguideref:item:11287:Lesser Magic Wand") == "item:11287", tooltipShown)
+check("a talent named without an ID resolves through the talent tree", hover("fieldguideref:::Improved Channeling") == "spell:102", tooltipShown)
+check("an unresolved reference shows no tooltip", hover("fieldguideref:::Unknown Thing") == nil, tooltipShown)
+check("the Pin handles references too", named("FieldGuidePinContent").scripts.OnHyperlinkEnter ~= nil)
 
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)

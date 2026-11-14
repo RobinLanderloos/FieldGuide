@@ -139,7 +139,7 @@
       "id": "009",
       "title": "References: highlighted names with tooltips",
       "description": "Markup tokenizes `[Name]`, `[spell:id:Name]`, `[item:Name]` and `[item:id:Name]`. Section text shows References in a highlight colour. Hovering shows the game tooltip when the References adapter can resolve it (spell IDs, items with IDs, known spells and talents by name); otherwise it stays a coloured name.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/009-references-highlighted-names-with-tooltips.md",
       "acceptanceCriteria": [
         "Tokenizer handles plain text, References and URLs in one line, including brackets that are not References",

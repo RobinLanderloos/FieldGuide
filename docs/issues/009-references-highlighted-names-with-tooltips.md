@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,10 +13,10 @@ Markup tokenizes `[Name]`, `[spell:id:Name]`, `[item:Name]` and `[item:id:Name]`
 
 ## Acceptance criteria
 
-- [ ] Tokenizer handles plain text, References and URLs in one line, including brackets that are not References
-- [ ] Resolver chooses tooltip vs plain colour
-- [ ] Hover shows a GameTooltip for resolvable References only
-- [ ] Unit tests for Tokenize and Render; smoke test hovers a Reference
+- [x] Tokenizer handles plain text, References and URLs in one line, including brackets that are not References
+- [x] Resolver chooses tooltip vs plain colour
+- [x] Hover shows a GameTooltip for resolvable References only
+- [x] Unit tests for Tokenize and Render; smoke test hovers a Reference
 
 ## Blocked by
 

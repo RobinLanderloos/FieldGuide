@@ -16,6 +16,7 @@ Core\Display.lua
 Game\Main.lua
 Game\Talents.lua
 Game\CopyBox.lua
+Game\References.lua
 Game\LibraryView.lua
 Game\GuideWindow.lua
 Game\TalentPanel.lua
