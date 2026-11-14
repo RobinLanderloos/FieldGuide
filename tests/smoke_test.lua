@@ -155,7 +155,7 @@ local GOOD = table.concat({
   "!guide v1", "title: Arcane Mage Guide", "variant: Arcane Leveling Solo", "class: MAGE",
   "author: <Progress> Avoid", "updated: 2026-11-14", "url: https://example.test/arcane",
   "## Overview", "Arcane is fast.", "- Keep Arcane Intellect up",
-  "## Tips", "1. Get a wand",
+  "## Tips", "1. Get a wand", "See https://wowhead.test/wand",
 }, "\n")
 named("FieldGuideImportEditBox"):SetText(GOOD)
 named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
@@ -173,6 +173,25 @@ check("each section gets a list button", tipsButton and tipsButton.text == "Tips
 if tipsButton then tipsButton.scripts.OnClick(tipsButton) end
 texts = shownTexts()
 check("clicking a section shows its text", texts:find("1. Get a wand", 1, true) and not texts:find("Arcane is fast.", 1, true), texts)
+
+-- Issue 002: the Source page link can be copied.
+tipsButton.scripts.OnClick(tipsButton)
+check("URLs in section text are shown as links", shownTexts():find("|Hfieldguideurl:https://wowhead.test/wand|h", 1, true) ~= nil, shownTexts())
+local linkButton = named("FieldGuideLinkButton")
+check("the window has a link button", linkButton and visible(linkButton))
+if linkButton then linkButton.scripts.OnClick(linkButton) end
+local copy = named("FieldGuideCopyBox")
+check("the link button opens the copy box", copy and visible(copy))
+check("the copy box holds the Source page URL", named("FieldGuideCopyEditBox") and named("FieldGuideCopyEditBox").text == "https://example.test/arcane",
+  named("FieldGuideCopyEditBox") and named("FieldGuideCopyEditBox").text)
+if copy then copy:Hide() end
+local contentFrame = named("FieldGuideContent")
+check("section text links can be clicked", contentFrame and contentFrame.scripts.OnHyperlinkClick)
+if contentFrame and contentFrame.scripts.OnHyperlinkClick then
+  contentFrame.scripts.OnHyperlinkClick(contentFrame, "fieldguideurl:https://wowhead.test/wand", "x", "LeftButton")
+  check("clicking a URL in the text opens the copy box with it", visible(copy) and named("FieldGuideCopyEditBox").text == "https://wowhead.test/wand")
+  copy:Hide()
+end
 
 -- A bad paste keeps the box open with the errors.
 slash("FIELDGUIDE", "import")

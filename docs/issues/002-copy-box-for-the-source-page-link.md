@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,10 +13,10 @@ A link button in the Guide window header opens the Copy box with the Source page
 
 ## Acceptance criteria
 
-- [ ] Link button opens the Copy box with the full URL highlighted and focused
-- [ ] Esc or clicking away closes it
-- [ ] URLs in Section text are detected (Markup) and clickable
-- [ ] Tests cover URL detection; smoke test opens the Copy box
+- [x] Link button opens the Copy box with the full URL highlighted and focused
+- [x] Esc or clicking away closes it
+- [x] URLs in Section text are detected (Markup) and clickable
+- [x] Tests cover URL detection; smoke test opens the Copy box
 
 ## Blocked by
 

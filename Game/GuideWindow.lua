@@ -6,14 +6,14 @@ ns.GuideWindow = GuideWindow
 
 local L = ns.L
 local LIST_W, ROW_H = 160, 22
-local frame, header, sub, status, content, text, empty
+local frame, header, sub, link, status, content, text, empty
 local buttons, selected = {}, 1
 
 -- Section text as written; bullets get a proper dot.
 local function sectionText(section)
   local out = {}
   for i, line in ipairs(section.lines) do
-    out[i] = (line:gsub("^(%s*)[-*]%s+", "%1\226\128\162 "))
+    out[i] = ns.Markup.Render((line:gsub("^(%s*)[-*]%s+", "%1\226\128\162 ")))
   end
   return table.concat(out, "\n")
 end
@@ -39,6 +39,15 @@ local function create()
   sub:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -4)
   sub:SetJustifyH("LEFT")
 
+  link = CreateFrame("Button", "FieldGuideLinkButton", frame, "UIPanelButtonTemplate")
+  link:SetSize(70, 22)
+  link:SetPoint("TOPRIGHT", -14, -32)
+  link:SetText(L.LINK_BUTTON)
+  link:SetScript("OnClick", function()
+    local guide = ns.library and ns.library:Active()
+    if guide then ns.CopyBox.Show(guide.url) end
+  end)
+
   status = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   status:SetPoint("BOTTOMLEFT", 16, 12)
   status:SetJustifyH("LEFT")
@@ -50,7 +59,12 @@ local function create()
   local scroll = CreateFrame("ScrollFrame", "FieldGuideContentScroll", frame, "UIPanelScrollFrameTemplate")
   scroll:SetPoint("TOPLEFT", 16 + LIST_W + 12, -80)
   scroll:SetPoint("BOTTOMRIGHT", -32, 32)
-  content = CreateFrame("Frame", nil, scroll)
+  content = CreateFrame("Frame", "FieldGuideContent", scroll)
+  content:SetHyperlinksEnabled(true)
+  content:SetScript("OnHyperlinkClick", function(_, link)
+    local url = ns.Markup.LinkURL(link)
+    if url then ns.CopyBox.Show(url) end
+  end)
   content:SetSize(400, 10)
   scroll:SetScrollChild(content)
   text = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -87,6 +101,7 @@ function GuideWindow.Refresh()
   empty:SetShown(not guide)
   header:SetShown(guide and true or false)
   sub:SetShown(guide and true or false)
+  link:SetShown(guide and true or false)
   for _, b in ipairs(buttons) do b:Hide() end
   if not guide then
     text:SetText("")

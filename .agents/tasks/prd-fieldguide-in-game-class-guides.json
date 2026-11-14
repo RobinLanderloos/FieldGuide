@@ -21,7 +21,7 @@
       "id": "002",
       "title": "Copy box for the Source page link",
       "description": "A link button in the Guide window header opens the Copy box with the Source page URL selected for Ctrl+C. Bare URLs inside Section text are shown as clickable links that open the same Copy box.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/002-copy-box-for-the-source-page-link.md",
       "acceptanceCriteria": [
         "Link button opens the Copy box with the full URL highlighted and focused",

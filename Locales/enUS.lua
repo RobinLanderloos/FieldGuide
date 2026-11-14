@@ -13,6 +13,9 @@ ns.L = {
   IMPORT_BUTTON = "Import",
   UPDATED_ON = "updated %s",
   BY = "by %s",
+  COPY_TITLE = "Copy link",
+  COPY_HINT = "Ctrl+C to copy, Esc to close",
+  LINK_BUTTON = "Link",
   HELP = {
     "/guide - show or hide the guide window",
     "/guide import - paste a Guide Import",
