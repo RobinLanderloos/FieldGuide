@@ -23,6 +23,44 @@ ImportParser.VERSION = 1
 
 local REQUIRED = { "title", "variant", "class", "url" }
 
+local function trimBlank(list)
+  while list[1] and trim(list[1]) == "" do table.remove(list, 1) end
+  while list[#list] and trim(list[#list]) == "" do table.remove(list) end
+end
+
+-- ## Rotation: "@ from-to", "@ from+" or "@ label" start a part; text before
+-- the first "@" is a part that is always shown.
+local function parseRotation(section, errors)
+  local parts, part = {}, { lines = {} }
+  parts[1] = part
+  for j, line in ipairs(section.lines) do
+    local marker = line:match("^@%s*(.-)%s*$")
+    if marker then
+      part = { lines = {}, label = marker }
+      local from, to = marker:match("^(%d+)%s*%-%s*(%d+)$")
+      local open = marker:match("^(%d+)%s*%+$")
+      if from then
+        part.from, part.to = tonumber(from), tonumber(to)
+        if part.to < part.from then
+          errors[#errors + 1] = { line = section.line + j, message = "The level range runs backwards." }
+        end
+      elseif open then
+        part.from = tonumber(open)
+      elseif marker:match("^%d") or marker == "" then
+        errors[#errors + 1] = { line = section.line + j, message = "Expected \"@ 10-20\", \"@ 26+\" or \"@ Label\"." }
+      end
+      parts[#parts + 1] = part
+    else
+      part.lines[#part.lines + 1] = line
+    end
+  end
+  for _, p in ipairs(parts) do trimBlank(p.lines) end
+  if #parts[1].lines == 0 then table.remove(parts, 1) end
+  section.kind, section.parts = "rotation", parts
+end
+
+local TYPED = { rotation = parseRotation }
+
 local function fail(line, message)
   return nil, { { line = line, message = message } }
 end
@@ -56,6 +94,11 @@ function ImportParser.Parse(text)
     end
   end
 
+  for _, sec in ipairs(guide.sections) do
+    local typed = TYPED[sec.title:lower()]
+    if typed then typed(sec, errors) end
+  end
+
   for _, key in ipairs(REQUIRED) do
     if not guide[key] or guide[key] == "" then
       errors[#errors + 1] = { line = 1, message = ("The header has no \"%s:\" line."):format(key) }
@@ -64,9 +107,6 @@ function ImportParser.Parse(text)
   if #errors > 0 then return nil, errors end
 
   guide.class = guide.class:upper()
-  for _, sec in ipairs(guide.sections) do
-    while sec.lines[1] and trim(sec.lines[1]) == "" do table.remove(sec.lines, 1) end
-    while sec.lines[#sec.lines] and trim(sec.lines[#sec.lines]) == "" do table.remove(sec.lines) end
-  end
+  for _, sec in ipairs(guide.sections) do trimBlank(sec.lines) end
   return guide
 end

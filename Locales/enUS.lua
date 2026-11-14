@@ -22,6 +22,9 @@ ns.L = {
   USE = "Use",
   DELETE = "Delete",
   CONFIRM_DELETE = "Sure?",
+  LEVEL_RANGE = "Level %s",
+  NO_ROTATION_FOR_LEVEL = "|cff999999The guide has no rotation for level %d.|r",
+  SHOW_ALL_LEVELS = "All levels",
   HELP = {
     "/guide - show or hide the guide window",
     "/guide import - paste a Guide Import",

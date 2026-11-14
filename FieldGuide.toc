@@ -10,6 +10,8 @@ Core\ImportParser.lua
 Core\Library.lua
 Core\ImportReport.lua
 Core\Markup.lua
+Core\Rotation.lua
+Core\Display.lua
 Game\Main.lua
 Game\CopyBox.lua
 Game\LibraryView.lua

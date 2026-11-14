@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,11 +13,11 @@ The typed `## Rotation` block is parsed into level-ranged parts (`@ 1-8`, `@ 26+
 
 ## Acceptance criteria
 
-- [ ] Parser builds Rotation parts and rejects malformed `@` lines with line numbers
-- [ ] PartsForLevel picks the later part on overlap and always includes unranged parts
-- [ ] Guide window updates on PLAYER_LEVEL_UP
-- [ ] Show all toggle reveals every range
-- [ ] Unit tests and smoke test pass
+- [x] Parser builds Rotation parts and rejects malformed `@` lines with line numbers
+- [x] PartsForLevel picks the later part on overlap and always includes unranged parts
+- [x] Guide window updates on PLAYER_LEVEL_UP
+- [x] Show all toggle reveals every range
+- [x] Unit tests and smoke test pass
 
 ## Blocked by
 

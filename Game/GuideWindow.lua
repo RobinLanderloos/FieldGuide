@@ -7,16 +7,8 @@ ns.GuideWindow = GuideWindow
 local L = ns.L
 local LIST_W, ROW_H = 160, 22
 local frame, header, sub, link, guidesButton, status, scroll, content, text, empty, library
-local buttons, selected, mode = {}, 1, "guide"
-
--- Section text as written; bullets get a proper dot.
-local function sectionText(section)
-  local out = {}
-  for i, line in ipairs(section.lines) do
-    out[i] = ns.Markup.Render((line:gsub("^(%s*)[-*]%s+", "%1\226\128\162 ")))
-  end
-  return table.concat(out, "\n")
-end
+local buttons, selected, mode, showAll = {}, 1, "guide", false
+local allLevels
 
 local function create()
   frame = CreateFrame("Frame", "FieldGuideWindow", UIParent, "BasicFrameTemplateWithInset")
@@ -56,6 +48,23 @@ local function create()
     mode = mode == "library" and "guide" or "library"
     ns.LibraryView.Forget()
     GuideWindow.Refresh()
+  end)
+
+  allLevels = CreateFrame("CheckButton", "FieldGuideShowAllLevels", frame, "UICheckButtonTemplate")
+  allLevels:SetSize(24, 24)
+  allLevels:SetPoint("BOTTOMRIGHT", -110, 6)
+  if allLevels.Text then allLevels.Text:SetText(L.SHOW_ALL_LEVELS) end
+  allLevels:SetScript("OnClick", function(self)
+    showAll = not showAll
+    self:SetChecked(showAll)
+    GuideWindow.Refresh()
+  end)
+
+  frame:RegisterEvent("PLAYER_LEVEL_UP")
+  frame:SetScript("OnEvent", function()
+    -- UnitLevel lags PLAYER_LEVEL_UP by a frame; refresh now and once more.
+    GuideWindow.Refresh()
+    C_Timer.After(0.2, GuideWindow.Refresh)
   end)
 
   library = ns.LibraryView.Create(frame)
@@ -102,7 +111,7 @@ local function button(i)
   b:SetHighlightFontObject("GameFontHighlight")
   b:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD")
   b:SetScript("OnClick", function()
-    selected = i
+    selected, mode = i, "guide"
     GuideWindow.Refresh()
   end)
   buttons[i] = b
@@ -126,6 +135,7 @@ function GuideWindow.Refresh()
   local guide = ns.library and ns.library:Active()
   for _, b in ipairs(buttons) do b:Hide() end
   library:Hide()
+  allLevels:Hide()
   link:SetShown(guide and true or false)
   if not guide and next(ns.library.db.guides) then mode = "library" end
   scroll:SetShown(mode == "guide")
@@ -152,7 +162,8 @@ function GuideWindow.Refresh()
     if i == selected then b:LockHighlight() else b:UnlockHighlight() end
   end
   local section = guide.sections[selected]
-  text:SetText(section and sectionText(section) or "")
+  allLevels:SetShown(section and section.kind == "rotation" or false)
+  text:SetText(section and ns.Display.SectionText(section, { level = UnitLevel("player"), showAll = showAll }) or "")
   content:SetHeight(math.max(10, text:GetHeight()))
 end
 

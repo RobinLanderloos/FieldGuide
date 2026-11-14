@@ -156,6 +156,7 @@ local GOOD = table.concat({
   "author: <Progress> Avoid", "updated: 2026-11-14", "url: https://example.test/arcane",
   "## Overview", "Arcane is fast.", "- Keep Arcane Intellect up",
   "## Tips", "1. Get a wand", "See https://wowhead.test/wand",
+  "## Rotation", "Keep buffs up.", "@ 1-8", "1. Fireball", "@ 8-20", "1. Arcane Missiles", "@ AoE", "1. Arcane Explosion",
 }, "\n")
 named("FieldGuideImportEditBox"):SetText(GOOD)
 named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
@@ -224,6 +225,26 @@ del1.scripts.OnClick(del1)
 count = 0; for _ in pairs(FieldGuideDB.guides) do count = count + 1 end
 check("the second Delete click deletes", count == 1, count)
 check("the active Solo guide is still active", FieldGuideCharDB.active and FieldGuideCharDB.active:find("Solo", 1, true) ~= nil)
+
+-- Issue 004: rotation by level (the stand-in player is level 12).
+local rotButton = named("FieldGuideSectionButton3")
+rotButton.scripts.OnClick(rotButton)
+texts = shownTexts()
+check("the rotation shows the part for the level and the always-shown parts",
+  texts:find("Arcane Missiles", 1, true) and texts:find("Arcane Explosion", 1, true) and texts:find("Keep buffs up.", 1, true)
+  and not texts:find("1. Fireball", 1, true), texts)
+local allLevels = named("FieldGuideShowAllLevels")
+check("an All levels toggle is shown on the rotation", allLevels and visible(allLevels))
+allLevels.scripts.OnClick(allLevels)
+check("All levels shows every part", shownTexts():find("1. Fireball", 1, true) ~= nil, shownTexts())
+allLevels.scripts.OnClick(allLevels)
+_G.UnitLevel = function() return 5 end
+fire("PLAYER_LEVEL_UP", 5)
+check("the rotation follows the level", shownTexts():find("1. Fireball", 1, true) ~= nil, shownTexts())
+_G.UnitLevel = function() return 12 end
+local overview = named("FieldGuideSectionButton1")
+overview.scripts.OnClick(overview)
+check("the All levels toggle is hidden on other sections", not visible(allLevels))
 
 -- A bad paste keeps the box open with the errors.
 slash("FIELDGUIDE", "import")

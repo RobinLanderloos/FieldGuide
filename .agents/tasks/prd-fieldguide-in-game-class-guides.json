@@ -54,7 +54,7 @@
       "id": "004",
       "title": "Rotation by level",
       "description": "The typed `## Rotation` block is parsed into level-ranged parts (`@ 1-8`, `@ 26+`) and always-shown parts (`@ AoE`, text before the first `@`). The Guide window shows the part for the character's level plus the always-shown parts, with a toggle to show all parts.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/004-rotation-by-level.md",
       "acceptanceCriteria": [
         "Parser builds Rotation parts and rejects malformed `@` lines with line numbers",
