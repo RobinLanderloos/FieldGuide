@@ -136,6 +136,8 @@ _G.C_Spell.GetSpellInfo = function() return nil end
 _G.C_Item = { GetItemInfo = function() return nil end }
 _G.LOCALIZED_CLASS_NAMES_MALE = { MAGE = "Mage", WARRIOR = "Warrior", DRUID = "Druid" }
 _G.RAID_CLASS_COLORS = { MAGE = { colorStr = "ff3fc7eb" }, WARRIOR = { colorStr = "ffc69b6d" } }
+_G.Minimap = CreateFrame("Frame", "Minimap", UIParent)
+Minimap:SetSize(140, 140)
 _G.FieldGuideDB = nil
 _G.FieldGuideCharDB = nil
 _G.UnitClass = function() return "Mage", "MAGE", 8 end
@@ -381,6 +383,27 @@ do
   slash("FIELDGUIDE", "glow")
   PlayerSpellsFrame:Hide()
   w.scripts.OnUpdate(w, 1)
+end
+
+-- Minimap button.
+do
+  local mb = named("FieldGuideMinimapButton")
+  check("there is a minimap button", mb and visible(mb))
+  check("it sits on the minimap", mb and mb.point and mb.point[2] == Minimap, mb and mb.point and tostring(mb.point[2]))
+  local win = named("FieldGuideWindow")
+  local wasShown = visible(win)
+  mb.scripts.OnClick(mb, "LeftButton")
+  check("left-click toggles the guide window", visible(win) ~= wasShown)
+  mb.scripts.OnClick(mb, "LeftButton")
+  local pin = named("FieldGuidePin")
+  local pinShown = pin and visible(pin)
+  mb.scripts.OnClick(mb, "RightButton")
+  check("right-click toggles the Pin", visible(named("FieldGuidePin")) ~= pinShown)
+  mb.scripts.OnClick(mb, "RightButton")
+  slash("FIELDGUIDE", "minimap")
+  check("/guide minimap hides the button and remembers it", not visible(mb) and FieldGuideDB.minimap.hide == true)
+  slash("FIELDGUIDE", "minimap")
+  check("/guide minimap shows it again", visible(mb) and FieldGuideDB.minimap.hide == false)
 end
 
 -- Issue 002: the Source page link can be copied.

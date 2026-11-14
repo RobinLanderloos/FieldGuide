@@ -14,6 +14,7 @@ Core\Rotation.lua
 Core\LevelingPath.lua
 Core\Display.lua
 Core\AIPrompt.lua
+Core\MinimapMath.lua
 Game\Main.lua
 Game\Talents.lua
 Game\CopyBox.lua
@@ -26,4 +27,5 @@ Game\Pin.lua
 Game\LevelUpNotice.lua
 Game\ImportBox.lua
 Game\Report.lua
+Game\MinimapButton.lua
 Game\Slash.lua

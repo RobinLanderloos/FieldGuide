@@ -11,6 +11,8 @@ SlashCmdList.FIELDGUIDE = function(message)
   elseif command == "debug" then
     ns.Report.Run()
     say(ns.L.DEBUG_DONE)
+  elseif command == "minimap" then
+    say(ns.MinimapButton.Toggle() and ns.L.MINIMAP_SHOWN or ns.L.MINIMAP_HIDDEN)
   elseif command == "glow" then
     ns.Glow.SetEnabled(not ns.Glow.Enabled())
     say(ns.Glow.Enabled() and ns.L.GLOW_ON or ns.L.GLOW_OFF)

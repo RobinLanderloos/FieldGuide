@@ -16,6 +16,7 @@ WoW Forever addon: your class guide in-game. Sections, a talent plan that ticks 
 - `/guide import`: paste a guide
 - `/guide pin`: show or hide the Pin
 - `/guide glow`: turn the glow on the next talent on or off (works in Blizzard's talent window, also when skinned by ElvUI, and in EllesmereUI's classic talent window)
+- `/guide minimap`: hide or show the minimap button (left-click: guide window, right-click: Pin, drag to move)
 - `/guide debug`: save a diagnostic report
 - Key bindings: Key Bindings > AddOns > FieldGuide
 
