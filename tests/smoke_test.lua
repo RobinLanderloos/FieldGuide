@@ -40,7 +40,9 @@ local function newWidget(parent)
       return function(s, ...) if not rawget(s, "point") then rawset(s, "point", { ... }) end end
     end
     if key == "ClearAllPoints" then return function(s) rawset(s, "point", nil) end end
-    if type(key) == "string" and key:match("^Create") then return function(s) return newWidget(s) end end
+    if type(key) == "string" and key:match("^Create") then
+      return function(s, name) local c = newWidget(s); if type(name) == "string" then rawset(c, "name", name) end; return c end
+    end
     if type(key) == "string" and key:match("^%u") then return function() end end
     return nil
   end })
@@ -229,6 +231,34 @@ check("the panel shows the next step", texts:find(">>|r |cffffd10012-14  Improve
 EUI_ClassicTalents:Hide()
 watcher.scripts.OnUpdate(watcher, 1)
 check("the panel hides with the talent window", not visible(panel))
+
+-- Issue 007: the Pin.
+local rot = named("FieldGuideSectionButton4")
+rot.scripts.OnClick(rot)
+local pinButton = named("FieldGuidePinButton")
+check("the window has a Pin button", pinButton and visible(pinButton))
+pinButton.scripts.OnClick(pinButton)
+local pin = named("FieldGuidePin")
+check("pinning shows the Pin", pin and visible(pin))
+local pinText = named("FieldGuidePinText")
+check("the Pin shows the pinned section for the level", pinText and pinText.text and pinText.text:find("Arcane Missiles", 1, true)
+  and not pinText.text:find("1. Fireball", 1, true), pinText and pinText.text)
+local pinNext = named("FieldGuidePinNext")
+check("the Pin shows the next talent", pinNext and visible(pinNext) and pinNext.text and pinNext.text:find("Improved Channeling 3/5", 1, true), pinNext and pinNext.text)
+local nextToggle = named("FieldGuidePinNextToggle")
+nextToggle.scripts.OnClick(nextToggle)
+check("the next talent line can be turned off", not visible(pinNext))
+nextToggle.scripts.OnClick(nextToggle)
+check("pin state is saved per character", FieldGuideCharDB.pin and FieldGuideCharDB.pin.section == "Rotation" and FieldGuideCharDB.pin.shown == true)
+slash("FIELDGUIDE", "pin")
+check("/guide pin hides the Pin", not visible(pin) and FieldGuideCharDB.pin.shown == false)
+check("a key binding function exists", type(_G.FieldGuide_TogglePin) == "function")
+FieldGuide_TogglePin()
+check("the key binding shows the Pin again", visible(pin))
+local pinLink = named("FieldGuidePinLink")
+pinLink.scripts.OnClick(pinLink)
+check("the Pin's link icon opens the copy box", visible(named("FieldGuideCopyBox")))
+named("FieldGuideCopyBox"):Hide()
 
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)

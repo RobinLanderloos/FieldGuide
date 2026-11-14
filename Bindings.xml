@@ -1,0 +1,8 @@
+<Bindings>
+  <Binding name="FIELDGUIDE_TOGGLE_PIN" header="FIELDGUIDE" category="ADDONS">
+    FieldGuide_TogglePin()
+  </Binding>
+  <Binding name="FIELDGUIDE_TOGGLE_WINDOW" category="ADDONS">
+    FieldGuide_ToggleWindow()
+  </Binding>
+</Bindings>

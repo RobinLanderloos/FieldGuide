@@ -106,7 +106,7 @@
       "id": "007",
       "title": "Pin: one pinned Section plus the Next talent line",
       "description": "Each Section header in the Guide window gets a pin button. The Pin shows the pinned Section (Rotation filtered by level) in a resizable, scrolling frame, with an optional Next talent line and a link icon. It opens and closes with its close button, a keybind and `/guide pin`. Position, size, pinned Section and visibility are saved per character.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/007-pin-one-pinned-section-plus-the-next-talent-line.md",
       "acceptanceCriteria": [
         "Pinning another Section replaces the current one",

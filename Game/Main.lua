@@ -9,4 +9,8 @@ loader:SetScript("OnEvent", function(self, event, name)
   FieldGuideCharDB = FieldGuideCharDB or {}
   ns.library = ns.Library.New(FieldGuideDB, FieldGuideCharDB)
   self:UnregisterEvent("ADDON_LOADED")
+  self:RegisterEvent("PLAYER_LOGIN")
+  self:SetScript("OnEvent", function()
+    ns.Pin.Restore()
+  end)
 end)

@@ -6,7 +6,7 @@ ns.GuideWindow = GuideWindow
 
 local L = ns.L
 local LIST_W, ROW_H = 160, 22
-local frame, header, sub, link, guidesButton, status, scroll, content, text, empty, library
+local frame, header, sub, link, pinButton, guidesButton, status, scroll, content, text, empty, library
 local buttons, selected, mode, showAll = {}, 1, "guide", false
 local allLevels
 
@@ -75,6 +75,16 @@ local function create()
   library:SetPoint("TOPLEFT", 16, -80)
   library:SetPoint("BOTTOMRIGHT", -16, 32)
 
+  pinButton = CreateFrame("Button", "FieldGuidePinButton", frame, "UIPanelButtonTemplate")
+  pinButton:SetSize(60, 22)
+  pinButton:SetPoint("RIGHT", guidesButton, "LEFT", -4, 0)
+  pinButton:SetText(L.PIN_BUTTON)
+  pinButton:SetScript("OnClick", function()
+    local guide = ns.library and ns.library:Active()
+    local section = guide and guide.sections[selected]
+    if section then ns.Pin.PinSection(section.title) end
+  end)
+
   status = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   status:SetPoint("BOTTOMLEFT", 16, 12)
   status:SetJustifyH("LEFT")
@@ -141,6 +151,7 @@ function GuideWindow.Refresh()
   library:Hide()
   allLevels:Hide()
   link:SetShown(guide and true or false)
+  pinButton:SetShown(guide and mode == "guide" or false)
   if not guide and next(ns.library.db.guides) then mode = "library" end
   scroll:SetShown(mode == "guide")
   if mode == "library" then return showLibrary() end

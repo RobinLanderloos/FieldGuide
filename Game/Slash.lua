@@ -8,6 +8,8 @@ SlashCmdList.FIELDGUIDE = function(message)
   local command = (message or ""):match("^%s*(%S*)"):lower()
   if command == "" then
     ns.GuideWindow.Toggle()
+  elseif command == "pin" then
+    ns.Pin.Toggle()
   elseif command == "import" then
     ns.ImportBox.Show()
   else

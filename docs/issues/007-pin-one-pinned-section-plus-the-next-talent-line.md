@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,11 +13,11 @@ Each Section header in the Guide window gets a pin button. The Pin shows the pin
 
 ## Acceptance criteria
 
-- [ ] Pinning another Section replaces the current one
-- [ ] Next talent line toggles independently and works with no pinned Section
-- [ ] Keybinds appear under Key Bindings > AddOns
-- [ ] State saved in FieldGuideCharDB and restored on login
-- [ ] Smoke test pins a Section and toggles the Pin
+- [x] Pinning another Section replaces the current one
+- [x] Next talent line toggles independently and works with no pinned Section
+- [x] Keybinds appear under Key Bindings > AddOns
+- [x] State saved in FieldGuideCharDB and restored on login
+- [x] Smoke test pins a Section and toggles the Pin
 
 ## Blocked by
 

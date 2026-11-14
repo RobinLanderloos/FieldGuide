@@ -34,9 +34,16 @@ ns.L = {
   TALENT_STEPS = "%d talent steps.",
   TALENTS_CHECKED_LATER = "Talent names will be checked when you log in on a %s.",
   UNKNOWN_TALENTS = "|cffff6060Not in your talent tree:|r %s",
+  PIN_BUTTON = "Pin",
+  PIN_HINT = "Pin a section from the guide window.",
+  PIN_NEXT_TOGGLE = "Next",
+  PIN_NEXT_OFF = "|cff808080Next|r",
+  BINDING_TOGGLE_PIN = "Show or hide the Pin",
+  BINDING_TOGGLE_WINDOW = "Show or hide the guide window",
   HELP = {
     "/guide - show or hide the guide window",
     "/guide import - paste a Guide Import",
+    "/guide pin - show or hide the Pin",
     "/guide help - this list",
   },
 }

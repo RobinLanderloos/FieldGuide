@@ -22,7 +22,7 @@ function Library:Add(guide)
   local key = Library.Key(guide)
   local previous = self.db.guides[key]
   self.db.guides[key] = guide
-  self.char.active = key
+  self:setActive(key)
   return key, previous and "updated" or "added", previous
 end
 
@@ -34,8 +34,15 @@ function Library:Active()
   return self.char.active and self.db.guides[self.char.active] or nil
 end
 
+function Library:setActive(key)
+  if self.char.active ~= key and self.char.pin then
+    self.char.pin.guide, self.char.pin.section = nil, nil
+  end
+  self.char.active = key
+end
+
 function Library:SetActive(key)
-  if key == nil or self.db.guides[key] then self.char.active = key end
+  if key == nil or self.db.guides[key] then self:setActive(key) end
 end
 
 function Library:Delete(key)
@@ -55,4 +62,25 @@ function Library:List(firstClass)
     return ga.variant < gb.variant
   end)
   return list
+end
+
+-- The Pin (per character): one section of the active guide, by title, so it
+-- survives re-importing the guide. Choosing another guide drops it.
+function Library:Pin(sectionTitle)
+  local state = self:PinState()
+  state.guide, state.section = self.char.active, sectionTitle
+end
+
+function Library:Pinned()
+  local state, guide = self:PinState(), self:Active()
+  if not guide or state.guide ~= self.char.active then return nil end
+  for _, section in ipairs(guide.sections) do
+    if section.title == state.section then return section end
+  end
+end
+
+-- Saved frame state of the Pin: shown, nextLine, position, size.
+function Library:PinState()
+  self.char.pin = self.char.pin or {}
+  return self.char.pin
 end

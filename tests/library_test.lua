@@ -77,3 +77,54 @@ test("a guide deleted on another character is not active here either", function(
   Library.New(db, alt):Delete(key)
   eq(Library.New(db, mage):Active(), nil)
 end)
+
+local function withSections()
+  local g = guide()
+  g.sections = { { title = "Overview", lines = {} }, { title = "Rotation", lines = {} } }
+  return g
+end
+
+test("a pinned section is remembered by its title for the active guide", function()
+  local lib = Library.New({}, {})
+  lib:Add(withSections())
+  lib:Pin("Rotation")
+  eq(lib:Pinned().title, "Rotation")
+end)
+
+test("pinning another section replaces the first", function()
+  local lib = Library.New({}, {})
+  lib:Add(withSections())
+  lib:Pin("Rotation"); lib:Pin("Overview")
+  eq(lib:Pinned().title, "Overview")
+end)
+
+test("the pin survives re-importing the guide", function()
+  local db, char = {}, {}
+  local lib = Library.New(db, char)
+  lib:Add(withSections()); lib:Pin("Rotation")
+  lib:Add(withSections())
+  eq(Library.New(db, char):Pinned().title, "Rotation")
+end)
+
+test("a pinned section the guide no longer has pins nothing", function()
+  local lib = Library.New({}, {})
+  lib:Add(withSections()); lib:Pin("Gear")
+  eq(lib:Pinned(), nil)
+end)
+
+test("switching guides drops the pin", function()
+  local lib = Library.New({}, {})
+  local first = lib:Add(withSections()); lib:Pin("Rotation")
+  local g2 = withSections(); g2.variant = "Group"
+  lib:Add(g2)
+  eq(lib:Pinned(), nil, "new guide")
+  lib:SetActive(first)
+  eq(lib:Pinned(), nil, "back again")
+end)
+
+test("pin frame state is kept per character", function()
+  local char = {}
+  local lib = Library.New({}, char)
+  lib:PinState().shown = true
+  eq(Library.New({}, char):PinState().shown, true)
+end)
