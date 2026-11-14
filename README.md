@@ -2,6 +2,8 @@
 
 WoW Forever addon: your class guide in-game. Sections, a talent plan that ticks off as you level, the rotation for your level, a small Pin you can keep on screen, a panel beside the talent window, and a copyable link back to the guide.
 
+*Made mainly for me and my friends. It's shared in case it's useful to others too, but expect it to follow our needs first.*
+
 ## Getting a guide into the game (any AI chat works)
 
 1. In-game: `/guide import`, then click **AI prompt** and press Ctrl+C. The same prompt is in `AI_PROMPT.txt` in the addon folder.
