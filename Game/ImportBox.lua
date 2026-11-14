@@ -28,7 +28,7 @@ end
 
 local function create()
   frame = CreateFrame("Frame", "FieldGuideImportBox", UIParent, "BasicFrameTemplateWithInset")
-  frame:SetSize(520, 420)
+  frame:SetSize(520, 460)
   frame:SetPoint("CENTER", 0, 40)
   frame:SetMovable(true)
   frame:EnableMouse(true)
@@ -46,7 +46,7 @@ local function create()
 
   local scroll = CreateFrame("ScrollFrame", "FieldGuideImportScroll", frame, "UIPanelScrollFrameTemplate")
   scroll:SetPoint("TOPLEFT", 16, -52)
-  scroll:SetPoint("BOTTOMRIGHT", -34, 110)
+  scroll:SetPoint("BOTTOMRIGHT", -34, 140)
   edit = CreateFrame("EditBox", "FieldGuideImportEditBox", scroll)
   edit:SetMultiLine(true)
   edit:SetAutoFocus(false)
@@ -73,14 +73,17 @@ local function create()
 
   -- Optional display name for the guide (ADR 0003: identity stays URL + Variant).
   nameBox = CreateFrame("EditBox", "FieldGuideImportNameBox", frame, "InputBoxTemplate")
-  nameBox:SetSize(160, 22)
-  nameBox:SetPoint("RIGHT", button, "LEFT", -12, 0)
+  -- Its own row above the buttons, label on the left, field filling the rest.
+  nameBox:SetHeight(22)
+  nameBox:SetPoint("BOTTOMLEFT", 132, 46)
+  nameBox:SetPoint("BOTTOMRIGHT", -18, 46)
   nameBox:SetAutoFocus(false)
   nameBox:SetMaxLetters(60)
   nameBox:SetScript("OnEscapePressed", function() frame:Hide() end)
   nameBox:SetScript("OnEnterPressed", import)
   local nameLabel = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-  nameLabel:SetPoint("RIGHT", nameBox, "LEFT", -8, 0)
+  nameLabel:SetPoint("RIGHT", nameBox, "LEFT", -10, 0)
+  nameLabel:SetJustifyH("RIGHT")
   nameLabel:SetText(L.IMPORT_NAME)
 
   local prompt = CreateFrame("Button", "FieldGuideImportPromptButton", frame, "UIPanelButtonTemplate")
