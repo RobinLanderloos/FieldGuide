@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## Title: FieldGuide
 ## Notes: Class guides in-game: sections, talent plan and rotation, imported from text.
-## Version: 0.1.0
+## Version: 0.1.0-beta
 ## SavedVariables: FieldGuideDB
 ## SavedVariablesPerCharacter: FieldGuideCharDB
 
