@@ -31,7 +31,7 @@ url: <the guide URL without #anchor or ?query>
 
 Then one empty line, then the sections. Every section starts with a line "## Heading" (exactly two # and a space). Any heading is allowed. Nothing goes between the header lines and the first "## " line. Text is shown as written; "- " starts a bullet, "1. " a numbered line.
 
-Two sections have a strict format:
+Two sections have a strict format and must be named exactly "## Talents" and "## Rotation" (not "Talent Order", "Talent Build", "Single Target"...). Put the whole leveling talent order in ## Talents, and put rotation sub-parts (single target, AoE, cooldowns, opener) inside ## Rotation as "@ Label" parts instead of separate sections. Every section has at least one line of text; do not write a heading directly followed by another heading.
 
 ## Talents   (the talent order while leveling)
 One line per step, in the guide's order:
@@ -95,11 +95,12 @@ CHECK BEFORE YOU ANSWER (fix anything that fails, silently):
 1. The first line is exactly "!guide v1".
 2. The header lines title, variant, class and url are present, written "key: value" with a colon, not indented, not bold.
 3. The first line after the header that is not empty starts with "## ".
-4. Every heading is "## Heading": two # characters, no bold, no colon at the end.
-5. Every line in ## Talents is "<level>[-<level>]: <Talent Name> <rank>/<max>", with no bullet or "Level" in front, and the ranks count up (cumulative).
-6. Every "@" line in ## Rotation is "@ 1-8", "@ 26+" or "@ Label".
-7. No Markdown anywhere: no **, no tables, no ### headings.
-8. The answer is one code block and nothing else.
+4. Every heading is "## Heading": two # characters, no bold, no colon at the end, and has text under it.
+5. The talent order is in a section named exactly "## Talents"; single target, AoE and cooldown parts are "@ Label" parts inside "## Rotation".
+6. Every line in ## Talents is "<level>[-<level>]: <Talent Name> <rank>/<max>", with no bullet or "Level" in front, and the ranks count up (cumulative).
+7. Every "@" line in ## Rotation is "@ 1-8", "@ 26+" or "@ Label".
+8. No Markdown anywhere: no **, no tables, no ### headings.
+9. The answer is one code block and nothing else.
 
 The guide to convert:
 ]==]

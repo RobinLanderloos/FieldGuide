@@ -78,6 +78,18 @@ end
 
 local TYPED = { rotation = parseRotation, talents = parseTalents }
 
+-- True when every non-blank line is a talent step (and there is one).
+function ImportParser.AllSteps(list)
+  local any = false
+  for _, line in ipairs(list) do
+    if trim(line) ~= "" then
+      if not ns.LevelingPath.ParseStep(line) then return false end
+      any = true
+    end
+  end
+  return any
+end
+
 local function fail(line, message)
   return nil, { { line = line, message = message } }
 end
@@ -148,9 +160,30 @@ function ImportParser.Parse(text)
     end
   end
 
+  -- Empty sections (a heading straight after another heading) are dropped.
+  for i = #guide.sections, 1, -1 do
+    local empty = true
+    for _, l in ipairs(guide.sections[i].lines) do
+      if trim(l) ~= "" then empty = false; break end
+    end
+    if empty then table.remove(guide.sections, i) end
+  end
+
+  local hasTalents = false
   for _, sec in ipairs(guide.sections) do
     local typed = TYPED[sec.title:lower()]
     if typed then typed(sec, errors) end
+    if sec.kind == "talents" then hasTalents = true end
+  end
+  -- No "## Talents"? A section named like "Talent Order" whose every line is a
+  -- step is the talent plan (AI chats rename the section).
+  if not hasTalents then
+    for _, sec in ipairs(guide.sections) do
+      if sec.title:lower():find("talent", 1, true) and ImportParser.AllSteps(sec.lines) then
+        parseTalents(sec, errors)
+        break
+      end
+    end
   end
 
   for _, key in ipairs(REQUIRED) do
