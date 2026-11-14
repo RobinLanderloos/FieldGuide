@@ -46,3 +46,49 @@ function CopyBox.Show(url)
   edit:SetFocus()
   edit:HighlightText()
 end
+
+-- A larger read-only box for long text (the AI prompt), all of it selected.
+local big, bigEdit, bigText
+
+local function createBig()
+  big = CreateFrame("Frame", "FieldGuidePromptBox", UIParent, "BasicFrameTemplateWithInset")
+  big:SetSize(560, 440)
+  big:SetPoint("CENTER", 0, 40)
+  big:SetFrameStrata("FULLSCREEN_DIALOG")
+  big:SetMovable(true)
+  big:EnableMouse(true)
+  big:RegisterForDrag("LeftButton")
+  big:SetScript("OnDragStart", big.StartMoving)
+  big:SetScript("OnDragStop", big.StopMovingOrSizing)
+  big:Hide()
+  tinsert(UISpecialFrames, "FieldGuidePromptBox")
+
+  local hint = big:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  hint:SetPoint("BOTTOM", 0, 12)
+  hint:SetText(L.PROMPT_HINT)
+
+  local scroll = CreateFrame("ScrollFrame", "FieldGuidePromptScroll", big, "UIPanelScrollFrameTemplate")
+  scroll:SetPoint("TOPLEFT", 16, -32)
+  scroll:SetPoint("BOTTOMRIGHT", -34, 32)
+  bigEdit = CreateFrame("EditBox", "FieldGuidePromptEditBox", scroll)
+  bigEdit:SetMultiLine(true)
+  bigEdit:SetAutoFocus(false)
+  bigEdit:SetMaxLetters(0)
+  bigEdit:SetFontObject(ChatFontNormal)
+  bigEdit:SetWidth(500)
+  bigEdit:SetScript("OnTextChanged", function(self, userInput)
+    if userInput then self:SetText(bigText); self:HighlightText() end
+  end)
+  bigEdit:SetScript("OnEscapePressed", function() big:Hide() end)
+  scroll:SetScrollChild(bigEdit)
+end
+
+function CopyBox.ShowText(title, text)
+  if not big then createBig() end
+  bigText = text
+  if big.TitleText then big.TitleText:SetText(title) end
+  bigEdit:SetText(text)
+  big:Show()
+  bigEdit:SetFocus()
+  bigEdit:HighlightText()
+end

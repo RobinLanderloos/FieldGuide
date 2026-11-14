@@ -68,6 +68,12 @@ local function create()
   button:SetPoint("BOTTOMRIGHT", -16, 12)
   button:SetText(L.IMPORT_BUTTON)
   button:SetScript("OnClick", import)
+
+  local prompt = CreateFrame("Button", "FieldGuideImportPromptButton", frame, "UIPanelButtonTemplate")
+  prompt:SetSize(120, 24)
+  prompt:SetPoint("BOTTOMLEFT", 16, 12)
+  prompt:SetText(L.PROMPT_BUTTON)
+  prompt:SetScript("OnClick", function() ns.CopyBox.ShowText(L.PROMPT_TITLE, ns.AIPrompt.TEXT) end)
 end
 
 function ImportBox.Show()

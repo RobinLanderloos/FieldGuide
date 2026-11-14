@@ -323,6 +323,18 @@ check("the report names the active guide", report:find("active: Arcane Mage Guid
 check("the report lists live talents", report:find("Improved Channeling 1/5", 1, true) ~= nil, report)
 check("the report gives the next talent", report:find("next:", 1, true) ~= nil, report)
 
+-- The AI prompt can be copied from the import box.
+slash("FIELDGUIDE", "import")
+local promptButton = named("FieldGuideImportPromptButton")
+check("the import box has an AI prompt button", promptButton and visible(promptButton))
+promptButton.scripts.OnClick(promptButton)
+local promptBox = named("FieldGuidePromptBox")
+check("the AI prompt box opens", promptBox and visible(promptBox))
+local promptEdit = named("FieldGuidePromptEditBox")
+check("the AI prompt box holds the prompt", promptEdit and promptEdit.text == ns.AIPrompt.TEXT)
+promptBox:Hide()
+named("FieldGuideImportBox"):Hide()
+
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
 check("URLs in section text are shown as links", shownTexts():find("|Hfieldguideurl:https://wowhead.test/wand|h", 1, true) ~= nil, shownTexts())
