@@ -119,3 +119,11 @@ function Library:Groups(firstClass)
   end)
   return groups
 end
+
+-- Sets a guide's custom name; a blank name goes back to the guide's title.
+function Library:Rename(key, name)
+  local guide = self.db.guides[key]
+  if not guide then return end
+  name = name and name:match("^%s*(.-)%s*$") or ""
+  guide.customName = name ~= "" and name or nil
+end

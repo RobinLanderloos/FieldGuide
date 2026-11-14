@@ -452,6 +452,31 @@ check("the guide's own title is still shown", texts:find("A Warrior Guide", 1, t
 check("the name field is cleared after import", (nameBox.text or "") == "")
 ns.library:Delete(FieldGuideCharDB.active)
 
+-- A guide can be renamed from the Guides list.
+do
+  ns.GuideWindow.Show()
+  local gb = named("FieldGuideGuidesButton")
+  gb.scripts.OnClick(gb)
+  local renameButton = named("FieldGuideLibraryRename1")
+  check("library rows have a Rename button", renameButton and visible(renameButton))
+  renameButton.scripts.OnClick(renameButton)
+  local nameEdit = named("FieldGuideLibraryNameEdit1")
+  check("Rename shows a name field filled with the current name", nameEdit and visible(nameEdit) and nameEdit.text and nameEdit.text ~= "", nameEdit and nameEdit.text)
+  nameEdit:SetText("Renamed || Guide")
+  nameEdit.scripts.OnEnterPressed(nameEdit)
+  local renamed
+  for _, g in pairs(FieldGuideDB.guides) do if g.customName == "Renamed | Guide" then renamed = g end end
+  check("Enter saves the new name", renamed ~= nil)
+  check("the list shows the new name", shownTexts():find("Renamed || Guide", 1, true) ~= nil, shownTexts())
+  check("the name field closes after saving", not visible(nameEdit))
+  renameButton.scripts.OnClick(renameButton)
+  nameEdit:SetText("not saved")
+  nameEdit.scripts.OnEscapePressed(nameEdit)
+  check("Esc cancels the rename", renamed.customName == "Renamed | Guide" and not visible(nameEdit))
+  renamed.customName = nil
+  gb.scripts.OnClick(gb)
+end
+
 -- A bad paste keeps the box open with the errors.
 slash("FIELDGUIDE", "import")
 named("FieldGuideImportEditBox"):SetText("!guide v1\ntitle: x")

@@ -4,7 +4,7 @@
 - **Variant**: one build or path on a Source page (e.g. "Arcane Leveling Solo"), with its own talents, rotation and gear.
 - **Guide Import**: the plain-text `!guide v1` document the converter produces for one Variant. It is pasted in-game.
 - **Guide**: one imported Variant, stored in the account-wide library. Identity = Source page URL + Variant name.
-- **Custom name**: an optional name the player gives a Guide at import. Display only; it replaces the title in the window, Guides list and Talent panel, and survives re-imports that leave the name empty.
+- **Custom name**: an optional name the player gives a Guide at import. Display only; it replaces the title in the window, Guides list and Talent panel, and survives re-imports that leave the name empty. Renamed later from the Guides list; an empty name goes back to the title.
 - **Active guide**: the Guide a character currently follows (stored per character).
 - **Section**: a `## Heading` block of a Guide. Free-form unless typed.
 - **Leveling Path**: the typed `## Talents` block, an ordered list of **Steps** (`level[-level]: Talent Name rank/max [| alternative] [-- comment]`).

@@ -9,7 +9,7 @@ ns.LibraryView = LibraryView
 local L = ns.L
 local ROW_H = 26
 local HEADER_H = 24
-local panel, rows, headers, pending = nil, {}, {}, nil
+local panel, rows, headers, pending, renaming = nil, {}, {}, nil, nil
 
 local function header(i)
   if headers[i] then return headers[i] end
@@ -50,7 +50,7 @@ local function row(i)
   r:SetHeight(ROW_H)
   r.label = r:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   r.label:SetPoint("LEFT", 14, 0)
-  r.label:SetPoint("RIGHT", -170, 0)
+  r.label:SetPoint("RIGHT", -250, 0)
   r.label:SetJustifyH("LEFT")
   r.label:SetWordWrap(false)
   r.use = CreateFrame("Button", "FieldGuideLibraryUse" .. i, r, "UIPanelButtonTemplate")
@@ -60,6 +60,17 @@ local function row(i)
   r.delete = CreateFrame("Button", "FieldGuideLibraryDelete" .. i, r, "UIPanelButtonTemplate")
   r.delete:SetSize(80, 22)
   r.delete:SetPoint("RIGHT", -4, 0)
+  r.rename = CreateFrame("Button", "FieldGuideLibraryRename" .. i, r, "UIPanelButtonTemplate")
+  r.rename:SetSize(76, 22)
+  r.rename:SetPoint("RIGHT", -162, 0)
+  r.rename:SetText(L.RENAME)
+  r.edit = CreateFrame("EditBox", "FieldGuideLibraryNameEdit" .. i, r, "InputBoxTemplate")
+  r.edit:SetHeight(22)
+  r.edit:SetPoint("LEFT", 18, 0)
+  r.edit:SetPoint("RIGHT", -250, 0)
+  r.edit:SetAutoFocus(false)
+  r.edit:SetMaxLetters(60)
+  r.edit:Hide()
   rows[i] = r
   return r
 end
@@ -93,6 +104,34 @@ function LibraryView.Refresh(onUse)
         lib:SetActive(key)
         onUse(key)
       end)
+      local editing = renaming == key
+      r.label:SetShown(not editing)
+      r.edit:SetShown(editing)
+      if editing then
+        -- The edit box shows a "|" written as "||"; it reads back the same way.
+        r.edit:SetText((ns.Library.DisplayName(guide):gsub("|", "||")))
+        r.edit:SetFocus()
+        r.edit:HighlightText()
+      end
+      r.edit:SetScript("OnEnterPressed", function(self)
+        renaming = nil
+        lib:Rename(key, ((self:GetText() or ""):gsub("||", "|")))
+        LibraryView.Refresh(onUse)
+      end)
+      r.edit:SetScript("OnEscapePressed", function()
+        renaming = nil
+        LibraryView.Refresh(onUse)
+      end)
+      r.rename:SetText(editing and L.SAVE or L.RENAME)
+      r.rename:SetScript("OnClick", function()
+        if renaming == key then
+          renaming = nil
+          lib:Rename(key, ((r.edit:GetText() or ""):gsub("||", "|")))
+        else
+          renaming, pending = key, nil
+        end
+        LibraryView.Refresh(onUse)
+      end)
       r.delete:SetText(pending == key and L.CONFIRM_DELETE or L.DELETE)
       r.delete:SetScript("OnClick", function()
         if pending == key then
@@ -109,4 +148,4 @@ function LibraryView.Refresh(onUse)
   return i
 end
 
-function LibraryView.Forget() pending = nil end
+function LibraryView.Forget() pending, renaming = nil, nil end
