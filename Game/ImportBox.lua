@@ -8,7 +8,9 @@ local L = ns.L
 local frame, edit, result
 
 local function import()
-  local ok, lines = ns.ImportReport.Import(edit:GetText(), ns.library,
+  -- The client's edit box escapes a pasted "|" as "||"; read it back as written.
+  local pasted = (edit:GetText():gsub("||", "|"))
+  local ok, lines = ns.ImportReport.Import(pasted, ns.library,
     { class = ns.Talents.PlayerClass(), live = ns.Talents.Live() })
   if ok then
     edit:SetText("")

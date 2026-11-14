@@ -297,11 +297,14 @@ do
   local f = assert(io.open("guides/mage-arcane-mage-guide-progress-arcane-leveling-solo.guide.txt", "rb"))
   local fixture = f:read("*a"); f:close()
   slash("FIELDGUIDE", "import")
-  named("FieldGuideImportEditBox"):SetText(fixture)
+  -- A pasted "|" comes back from the client's edit box as "||".
+  named("FieldGuideImportEditBox"):SetText((fixture:gsub("|", "||")))
   named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
   local t = shownTexts()
   check("the Arcane Mage Solo guide imports", t:find("Imported Arcane Mage Guide || <Progress> Avoid", 1, true) ~= nil, t)
   check("the window header escapes the pipe in the title", t:find("Arcane Mage Guide || <Progress> Avoid", 1, true) ~= nil)
+  local stored = ns.library:Active()
+  check("pasted pipes are read back as single pipes", stored and stored.title == "Arcane Mage Guide | <Progress> Avoid", stored and stored.title)
   -- remove it again and go back to the smoke guide for the checks below
   ns.library:Delete(ns.library.char.active)
   for key, g in pairs(FieldGuideDB.guides) do
