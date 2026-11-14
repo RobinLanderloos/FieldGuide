@@ -67,3 +67,33 @@ test("the next talent line names the talent, target rank and level", function()
   local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0 })
   eq(strip(Display.NextTalent(section, ev)), "Next talent: Precision 1/3 (level 12)")
 end)
+
+test("the talent panel shows the next steps from the next talent on, with comments", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0, ["Arcane Focus"] = 0, ["Arcane Subtlety"] = 0 })
+  local out = strip(Display.TalentPanelText(section, ev, 2))
+  assert(not out:find("Wand Specialization 2/2", 1, true), out)
+  assert(out:find(">> 12  Precision 1/3", 1, true), out)
+  assert(out:find("Arcane Focus 1/5", 1, true), out)
+  assert(not out:find("16  Nonsense", 1, true), "shows only 2 steps: " .. out)
+end)
+
+test("the talent panel lists unknown names and off-plan points", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0, ["Arcane Focus"] = 0, ["Arcane Subtlety"] = 0, ["Improved Blizzard"] = 2 })
+  local out = strip(Display.TalentPanelText(section, ev, 5))
+  assert(out:find("Nonsense", 1, true) and out:find("Improved Blizzard", 1, true), out)
+end)
+
+test("the talent panel says when the path is complete", function()
+  local section = Parse(HEAD .. "## Talents\n10: Precision 1/3\n").sections[1]
+  local out = strip(Display.TalentPanelText(section, evaluate(section, { Precision = 1 }), 5))
+  assert(out:find("complete", 1, true), out)
+end)
+
+test("the talent panel stops after the requested number of steps", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0, ["Arcane Focus"] = 0, ["Arcane Subtlety"] = 0 })
+  local out = strip(Display.TalentPanelText(section, ev, 1))
+  assert(out:find("Precision", 1, true) and not out:find("Arcane Focus", 1, true), out)
+end)

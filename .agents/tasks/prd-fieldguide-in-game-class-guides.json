@@ -90,7 +90,7 @@
       "id": "006",
       "title": "Talent panel docked beside the talent window",
       "description": "When EllesmereUI's classic talent window (EUI_ClassicTalents) or Blizzard's talent window is shown, a Talent panel docks beside it showing the next few Steps with comments, reached Steps ticked, off-plan points and unknown names. It updates when talents change.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/006-talent-panel-docked-beside-the-talent-window.md",
       "acceptanceCriteria": [
         "Docks to EUI_ClassicTalents when shown, else Blizzard's talent frame",

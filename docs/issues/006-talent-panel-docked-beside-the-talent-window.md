@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,10 +13,10 @@ When EllesmereUI's classic talent window (EUI_ClassicTalents) or Blizzard's tale
 
 ## Acceptance criteria
 
-- [ ] Docks to EUI_ClassicTalents when shown, else Blizzard's talent frame
-- [ ] Hidden when no Active guide or the talent window closes
-- [ ] Updates on TRAIT_CONFIG_UPDATED / talent change events
-- [ ] Smoke test shows the panel next to a stub window
+- [x] Docks to EUI_ClassicTalents when shown, else Blizzard's talent frame
+- [x] Hidden when no Active guide or the talent window closes
+- [x] Updates on TRAIT_CONFIG_UPDATED / talent change events
+- [x] Smoke test shows the panel next to a stub window
 
 ## Blocked by
 

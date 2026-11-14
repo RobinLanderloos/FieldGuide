@@ -211,6 +211,25 @@ texts = shownTexts()
 check("the Talents section follows talent changes", not texts:find(">>", 1, true), texts)
 talentNodes[2].rank = 1
 
+-- Issue 006: the talent panel docks beside the open talent window.
+local watcher = named("FieldGuideTalentWatcher")
+check("a watcher looks for talent windows", watcher and watcher.scripts.OnUpdate)
+_G.EUI_ClassicTalents = CreateFrame("Frame", "EUI_ClassicTalents", UIParent)
+EUI_ClassicTalents:Hide()
+watcher.scripts.OnUpdate(watcher, 1)
+local panel = named("FieldGuideTalentPanel")
+check("no panel while no talent window is open", not (panel and visible(panel)))
+EUI_ClassicTalents:Show()
+watcher.scripts.OnUpdate(watcher, 1)
+panel = named("FieldGuideTalentPanel")
+check("the panel shows beside EllesmereUI's talent window", panel and visible(panel))
+check("the panel is anchored to that window", panel and panel.point and panel.point[2] == EUI_ClassicTalents, panel and panel.point and tostring(panel.point[2]))
+texts = shownTexts()
+check("the panel shows the next step", texts:find(">>|r |cffffd10012-14  Improved Channeling 3/5", 1, true) ~= nil, texts)
+EUI_ClassicTalents:Hide()
+watcher.scripts.OnUpdate(watcher, 1)
+check("the panel hides with the talent window", not visible(panel))
+
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
 check("URLs in section text are shown as links", shownTexts():find("|Hfieldguideurl:https://wowhead.test/wand|h", 1, true) ~= nil, shownTexts())

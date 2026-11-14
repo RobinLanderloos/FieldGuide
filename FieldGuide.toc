@@ -18,5 +18,6 @@ Game\Talents.lua
 Game\CopyBox.lua
 Game\LibraryView.lua
 Game\GuideWindow.lua
+Game\TalentPanel.lua
 Game\ImportBox.lua
 Game\Slash.lua

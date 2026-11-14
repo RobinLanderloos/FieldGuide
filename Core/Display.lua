@@ -67,22 +67,51 @@ local function stepMark(i, ev)
   return MARKS.pending
 end
 
+local function stepLine(i, step, ev)
+  local line = ns.Markup.Render(levels(step) .. "  " .. options(step))
+  if step.comment then line = line .. "  |cff999999- " .. ns.Markup.Render(step.comment) .. "|r" end
+  local mark = stepMark(i, ev)
+  if i == (ev and ev.nextIndex) then line = "|cffffd100" .. line .. "|r" end
+  return mark and (mark .. " " .. line) or line
+end
+
+local function offPlanLines(ev, out)
+  if not ev or #ev.offPlan == 0 then return end
+  out[#out + 1] = ""
+  out[#out + 1] = HEADING:format(ns.L.OFF_PLAN)
+  for _, t in ipairs(ev.offPlan) do
+    out[#out + 1] = ns.L.OFF_PLAN_LINE:format(t.name, t.rank, t.extra)
+  end
+end
+
 local function talentsText(section, ev)
   local out = {}
-  for i, step in ipairs(section.steps) do
-    local line = ns.Markup.Render(levels(step) .. "  " .. options(step))
-    if step.comment then line = line .. "  |cff999999- " .. ns.Markup.Render(step.comment) .. "|r" end
-    local mark = stepMark(i, ev)
-    if i == (ev and ev.nextIndex) then line = "|cffffd100" .. line .. "|r" end
-    out[#out + 1] = mark and (mark .. " " .. line) or line
-  end
-  if ev and #ev.offPlan > 0 then
-    out[#out + 1] = ""
-    out[#out + 1] = HEADING:format(ns.L.OFF_PLAN)
-    for _, t in ipairs(ev.offPlan) do
-      out[#out + 1] = ns.L.OFF_PLAN_LINE:format(t.name, t.rank, t.extra)
+  for i, step in ipairs(section.steps) do out[#out + 1] = stepLine(i, step, ev) end
+  offPlanLines(ev, out)
+  return table.concat(out, "\n")
+end
+
+-- The docked talent panel: `count` steps from the next talent on, then the
+-- names the tree doesn't have and the off-plan points.
+function Display.TalentPanelText(section, ev, count)
+  local out = {}
+  if ev and ev.nextIndex then
+    local shown = 0
+    for i = ev.nextIndex, #section.steps do
+      if not ev.reached[i] and not ev.isUnknown[i] then
+        out[#out + 1] = stepLine(i, section.steps[i], ev)
+        shown = shown + 1
+        if shown >= count then break end
+      end
     end
+  else
+    out[#out + 1] = "|cff40ff40" .. ns.L.PATH_COMPLETE .. "|r"
   end
+  if ev and #ev.unknown > 0 then
+    out[#out + 1] = ""
+    out[#out + 1] = ns.L.UNKNOWN_TALENTS:format(table.concat(ev.unknown, ", "))
+  end
+  offPlanLines(ev, out)
   return table.concat(out, "\n")
 end
 
