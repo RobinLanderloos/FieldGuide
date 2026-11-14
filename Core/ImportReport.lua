@@ -5,8 +5,32 @@ local addonName, ns = ...
 local ImportReport = {}
 ns.ImportReport = ImportReport
 
+local function talentSteps(guide)
+  for _, section in ipairs(guide.sections) do
+    if section.kind == "talents" then return section.steps end
+  end
+end
+
+-- Talent step count and the names this character's tree doesn't have.
+local function talentLines(guide, context, lines)
+  local steps = talentSteps(guide)
+  if not steps then return end
+  local L = ns.L
+  lines[#lines + 1] = L.TALENT_STEPS:format(#steps)
+  if not context then return end
+  if context.class ~= guide.class then
+    lines[#lines + 1] = L.TALENTS_CHECKED_LATER:format(guide.class)
+    return
+  end
+  local ev = ns.LevelingPath.Evaluate(steps, context.live)
+  if ev.checked and #ev.unknown > 0 then
+    lines[#lines + 1] = L.UNKNOWN_TALENTS:format(table.concat(ev.unknown, ", "))
+  end
+end
+
+-- context (optional): { class = player's class token, live = live talents }.
 -- Returns ok, lines.
-function ImportReport.Import(text, library)
+function ImportReport.Import(text, library, context)
   local L = ns.L
   if not text or not text:find("%S") then
     return false, { L.NOTHING_TO_IMPORT }
@@ -20,9 +44,13 @@ function ImportReport.Import(text, library)
     return false, lines
   end
   local _, status, previous = library:Add(guide)
+  local lines
   if status == "updated" then
-    return true, { L.UPDATED:format(guide.title, guide.variant,
+    lines = { L.UPDATED:format(guide.title, guide.variant,
       previous.updated or "?", guide.updated or "?", #guide.sections) }
+  else
+    lines = { L.IMPORTED:format(guide.title, guide.variant, #guide.sections) }
   end
-  return true, { L.IMPORTED:format(guide.title, guide.variant, #guide.sections) }
+  talentLines(guide, context, lines)
+  return true, lines
 end

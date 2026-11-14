@@ -39,3 +39,26 @@ test("re-importing says Updated with the old and new dates", function()
   local text = table.concat(lines, "\n")
   assert(text:find("Updated", 1, true) and text:find("2026-11-14", 1, true) and text:find("2026-11-20", 1, true), text)
 end)
+
+local TALENTS = GOOD .. "## Talents\n10-11: Wand Specialization 2/2\n12: Wand Specialisation 2/2\n"
+local function liveTree()
+  return { [ns.LevelingPath.Normalize("Wand Specialization")] = { name = "Wand Specialization", rank = 0, max = 2 } }
+end
+
+test("the result counts the Leveling Path steps", function()
+  local _, lines = ImportReport.Import(TALENTS, ns.Library.New({}, {}), { class = "MAGE", live = liveTree() })
+  local text = table.concat(lines, "\n")
+  assert(text:find("2 talent steps", 1, true), text)
+end)
+
+test("talent names not in this character's tree are listed after import", function()
+  local _, lines = ImportReport.Import(TALENTS, ns.Library.New({}, {}), { class = "MAGE", live = liveTree() })
+  local text = table.concat(lines, "\n")
+  assert(text:find("Wand Specialisation", 1, true), text)
+end)
+
+test("a guide for another class says the talent check waits", function()
+  local _, lines = ImportReport.Import(TALENTS, ns.Library.New({}, {}), { class = "WARRIOR", live = {} })
+  local text = table.concat(lines, "\n")
+  assert(text:find("MAGE", 1, true) and not text:find("Wand Specialisation", 1, true), text)
+end)

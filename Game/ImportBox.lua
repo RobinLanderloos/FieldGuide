@@ -8,13 +8,15 @@ local L = ns.L
 local frame, edit, result
 
 local function import()
-  local ok, lines = ns.ImportReport.Import(edit:GetText(), ns.library)
+  local ok, lines = ns.ImportReport.Import(edit:GetText(), ns.library,
+    { class = ns.Talents.PlayerClass(), live = ns.Talents.Live() })
   if ok then
     edit:SetText("")
     result:SetText("")
     frame:Hide()
     ns.GuideWindow.Show()
     ns.GuideWindow.SetStatus(table.concat(lines, "  "))
+    for _, line in ipairs(lines) do print("|cff40c0ffFieldGuide:|r " .. line) end
   else
     result:SetText("|cffff6060" .. table.concat(lines, "\n") .. "|r")
   end

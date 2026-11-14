@@ -37,10 +37,68 @@ local function rotationText(section, opts)
   return table.concat(out, "\n")
 end
 
--- opts: level (number), showAll (rotation: every part).
+-- Step marks, as shown after colour codes are removed.
+Display.MARK_REACHED = "[x]"
+Display.MARK_NEXT = ">>"
+Display.MARK_PENDING = "[  ]"
+Display.MARK_UNKNOWN = "?"
+local MARKS = {
+  reached = "|cff40ff40" .. Display.MARK_REACHED .. "|r",
+  next = "|cffffd100" .. Display.MARK_NEXT .. "|r",
+  pending = "|cff808080" .. Display.MARK_PENDING .. "|r",
+  unknown = "|cffff6060" .. Display.MARK_UNKNOWN .. "|r",
+}
+
+local function levels(step)
+  return step.from == step.to and tostring(step.from) or (step.from .. "-" .. step.to)
+end
+
+local function options(step)
+  local out = {}
+  for i, o in ipairs(step.options) do out[i] = ("%s %d/%d"):format(o.name, o.rank, o.max) end
+  return table.concat(out, ns.L.OR)
+end
+
+local function stepMark(i, ev)
+  if not ev or not ev.checked then return nil end
+  if ev.reached[i] then return MARKS.reached end
+  if ev.isUnknown[i] then return MARKS.unknown end
+  if ev.nextIndex == i then return MARKS.next end
+  return MARKS.pending
+end
+
+local function talentsText(section, ev)
+  local out = {}
+  for i, step in ipairs(section.steps) do
+    local line = ns.Markup.Render(levels(step) .. "  " .. options(step))
+    if step.comment then line = line .. "  |cff999999- " .. ns.Markup.Render(step.comment) .. "|r" end
+    local mark = stepMark(i, ev)
+    if i == (ev and ev.nextIndex) then line = "|cffffd100" .. line .. "|r" end
+    out[#out + 1] = mark and (mark .. " " .. line) or line
+  end
+  if ev and #ev.offPlan > 0 then
+    out[#out + 1] = ""
+    out[#out + 1] = HEADING:format(ns.L.OFF_PLAN)
+    for _, t in ipairs(ev.offPlan) do
+      out[#out + 1] = ns.L.OFF_PLAN_LINE:format(t.name, t.rank, t.extra)
+    end
+  end
+  return table.concat(out, "\n")
+end
+
+-- "Next talent: X 1/3 (level 12)", or nil when there is none or nothing was checked.
+function Display.NextTalent(section, ev)
+  local step = ev and ev.nextIndex and section.steps[ev.nextIndex]
+  if not step then return nil end
+  return ns.L.NEXT_TALENT:format(options(step), levels(step))
+end
+
+-- opts: level (number), showAll (rotation: every part), talents (an
+-- evaluation from LevelingPath.Evaluate, for the Talents section).
 function Display.SectionText(section, opts)
   opts = opts or {}
   if section.kind == "rotation" then return rotationText(section, opts) end
+  if section.kind == "talents" then return talentsText(section, opts.talents) end
   local out = {}
   textLines(section.lines, out)
   return table.concat(out, "\n")

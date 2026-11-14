@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,13 +13,13 @@ The typed `## Talents` block is parsed into Steps with target ranks, `|` choices
 
 ## Acceptance criteria
 
-- [ ] Step syntax errors carry line numbers
-- [ ] Next talent = first Step not reached, regardless of level
-- [ ] Choice Steps are reached when any option is
-- [ ] Off-plan lists unplanned talents and ranks above the highest target
-- [ ] Unknown names reported on import (same class) and shown as ?
-- [ ] Name matching ignores case and extra whitespace
-- [ ] Unit tests cover Evaluate scenarios; smoke test uses a stubbed C_Traits
+- [x] Step syntax errors carry line numbers
+- [x] Next talent = first Step not reached, regardless of level
+- [x] Choice Steps are reached when any option is
+- [x] Off-plan lists unplanned talents and ranks above the highest target
+- [x] Unknown names reported on import (same class) and shown as ?
+- [x] Name matching ignores case and extra whitespace
+- [x] Unit tests cover Evaluate scenarios; smoke test uses a stubbed C_Traits
 
 ## Blocked by
 

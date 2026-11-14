@@ -67,6 +67,10 @@ local function create()
     C_Timer.After(0.2, GuideWindow.Refresh)
   end)
 
+  ns.Talents.OnChange(function()
+    if frame:IsShown() then GuideWindow.Refresh() end
+  end)
+
   library = ns.LibraryView.Create(frame)
   library:SetPoint("TOPLEFT", 16, -80)
   library:SetPoint("BOTTOMRIGHT", -16, 32)
@@ -163,7 +167,10 @@ function GuideWindow.Refresh()
   end
   local section = guide.sections[selected]
   allLevels:SetShown(section and section.kind == "rotation" or false)
-  text:SetText(section and ns.Display.SectionText(section, { level = UnitLevel("player"), showAll = showAll }) or "")
+  text:SetText(section and ns.Display.SectionText(section, {
+    level = UnitLevel("player"), showAll = showAll,
+    talents = section.kind == "talents" and ns.Talents.Evaluate(guide) or nil,
+  }) or "")
   content:SetHeight(math.max(10, text:GetHeight()))
 end
 

@@ -25,6 +25,13 @@ ns.L = {
   LEVEL_RANGE = "Level %s",
   NO_ROTATION_FOR_LEVEL = "|cff999999The guide has no rotation for level %d.|r",
   SHOW_ALL_LEVELS = "All levels",
+  OR = " or ",
+  OFF_PLAN = "Off-plan",
+  OFF_PLAN_LINE = "%s %d (%d more than the plan)",
+  NEXT_TALENT = "Next talent: %s (level %s)",
+  TALENT_STEPS = "%d talent steps.",
+  TALENTS_CHECKED_LATER = "Talent names will be checked when you log in on a %s.",
+  UNKNOWN_TALENTS = "|cffff6060Not in your talent tree:|r %s",
   HELP = {
     "/guide - show or hide the guide window",
     "/guide import - paste a Guide Import",

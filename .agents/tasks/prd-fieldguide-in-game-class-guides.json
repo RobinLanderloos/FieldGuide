@@ -71,7 +71,7 @@
       "id": "005",
       "title": "Leveling Path: parse, evaluate and check talent names",
       "description": "The typed `## Talents` block is parsed into Steps with target ranks, `|` choices and `--` comments. The Talents adapter reads the live C_Traits tree into a name to rank/max map. Evaluate marks reached Steps, finds the Next talent, lists off-plan points and unknown names. The import result lists unmatched talent names when the Guide's class matches the character, and says the check is deferred otherwise. The Guide window's Talents Section shows Steps ticked and the Next talent marked.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/005-leveling-path-parse-evaluate-and-check-talent-names.md",
       "acceptanceCriteria": [
         "Step syntax errors carry line numbers",

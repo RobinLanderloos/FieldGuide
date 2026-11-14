@@ -59,7 +59,24 @@ local function parseRotation(section, errors)
   section.kind, section.parts = "rotation", parts
 end
 
-local TYPED = { rotation = parseRotation }
+-- ## Talents: one Leveling Path step per non-blank line.
+local function parseTalents(section, errors)
+  local steps = {}
+  for j, line in ipairs(section.lines) do
+    if trim(line) ~= "" then
+      local step, message = ns.LevelingPath.ParseStep(line)
+      if step then
+        step.line = section.line + j
+        steps[#steps + 1] = step
+      else
+        errors[#errors + 1] = { line = section.line + j, message = message }
+      end
+    end
+  end
+  section.kind, section.steps = "talents", steps
+end
+
+local TYPED = { rotation = parseRotation, talents = parseTalents }
 
 local function fail(line, message)
   return nil, { { line = line, message = message } }

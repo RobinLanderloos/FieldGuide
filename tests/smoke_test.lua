@@ -104,6 +104,27 @@ _G.Settings = {
   RegisterAddOnCategory = function() end,
   OpenToCategory = function() end,
 }
+
+-- A stand-in talent tree (WoW Forever: vanilla trees on C_Traits).
+local talentNodes = {
+  [1] = { spellID = 101, name = "Wand Specialization", rank = 2, max = 2 },
+  [2] = { spellID = 102, name = "Improved Channeling", rank = 1, max = 5 },
+  [3] = { spellID = 103, name = "Arcane Focus", rank = 1, max = 5 },
+}
+_G.C_ClassTalents = { GetActiveConfigID = function() return 7 end }
+_G.C_Traits = {
+  GetConfigInfo = function() return { treeIDs = { 70 } } end,
+  GetTreeNodes = function() return { 1, 2, 3 } end,
+  GetNodeInfo = function(_, nodeID)
+    local n = talentNodes[nodeID]
+    return { isVisible = true, entryIDs = { nodeID * 10 }, currentRank = n.rank, activeRank = n.rank, maxRanks = n.max }
+  end,
+  GetEntryInfo = function(_, entryID) return { definitionID = entryID } end,
+  GetDefinitionInfo = function(definitionID) return { spellID = talentNodes[definitionID / 10].spellID } end,
+}
+_G.C_Spell = { GetSpellName = function(spellID)
+  for _, n in pairs(talentNodes) do if n.spellID == spellID then return n.name end end
+end }
 _G.FieldGuideDB = nil
 _G.FieldGuideCharDB = nil
 _G.UnitClass = function() return "Mage", "MAGE", 8 end
@@ -156,6 +177,7 @@ local GOOD = table.concat({
   "author: <Progress> Avoid", "updated: 2026-11-14", "url: https://example.test/arcane",
   "## Overview", "Arcane is fast.", "- Keep Arcane Intellect up",
   "## Tips", "1. Get a wand", "See https://wowhead.test/wand",
+  "## Talents", "10-11: Wand Specialization 2/2 -- wanding", "12-14: Improved Channeling 3/5", "15: Missile Barage 1/1",
   "## Rotation", "Keep buffs up.", "@ 1-8", "1. Fireball", "@ 8-20", "1. Arcane Missiles", "@ AoE", "1. Arcane Explosion",
 }, "\n")
 named("FieldGuideImportEditBox"):SetText(GOOD)
@@ -174,6 +196,20 @@ check("each section gets a list button", tipsButton and tipsButton.text == "Tips
 if tipsButton then tipsButton.scripts.OnClick(tipsButton) end
 texts = shownTexts()
 check("clicking a section shows its text", texts:find("1. Get a wand", 1, true) and not texts:find("Arcane is fast.", 1, true), texts)
+
+-- Issue 005: the Leveling Path.
+check("import lists talent names missing from the tree", shownTexts():find("Missile Barage", 1, true) ~= nil, shownTexts())
+local talentsButton = named("FieldGuideSectionButton3")
+talentsButton.scripts.OnClick(talentsButton)
+texts = shownTexts()
+check("the Talents section ticks reached steps and marks the next one",
+  texts:find("[x]", 1, true) and texts:find(">>", 1, true) and texts:find("Improved Channeling 3/5", 1, true), texts)
+check("off-plan points are listed", texts:find("Arcane Focus", 1, true) ~= nil, texts)
+talentNodes[2].rank = 3
+fire("TRAIT_CONFIG_UPDATED", 7)
+texts = shownTexts()
+check("the Talents section follows talent changes", not texts:find(">>", 1, true), texts)
+talentNodes[2].rank = 1
 
 -- Issue 002: the Source page link can be copied.
 tipsButton.scripts.OnClick(tipsButton)
@@ -227,7 +263,7 @@ check("the second Delete click deletes", count == 1, count)
 check("the active Solo guide is still active", FieldGuideCharDB.active and FieldGuideCharDB.active:find("Solo", 1, true) ~= nil)
 
 -- Issue 004: rotation by level (the stand-in player is level 12).
-local rotButton = named("FieldGuideSectionButton3")
+local rotButton = named("FieldGuideSectionButton4")
 rotButton.scripts.OnClick(rotButton)
 texts = shownTexts()
 check("the rotation shows the part for the level and the always-shown parts",

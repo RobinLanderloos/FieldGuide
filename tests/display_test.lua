@@ -28,3 +28,42 @@ test("a rotation with nothing for this level says so", function()
   local out = strip(Display.SectionText(section, { level = 30 }))
   assert(out:find("level 30", 1, true), out)
 end)
+
+local PATHTEXT = HEAD .. "## Talents\n10-11: Wand Specialization 2/2 -- wanding\n12: Precision 1/3\n15: Arcane Focus 1/5 | Arcane Subtlety 1/2\n16: Nonsense 1/1\n"
+
+local function evaluate(section, ranks)
+  local live = {}
+  for name, rank in pairs(ranks) do live[ns.LevelingPath.Normalize(name)] = { name = name, rank = rank, max = 5 } end
+  return ns.LevelingPath.Evaluate(section.steps, live)
+end
+
+test("the Leveling Path shows each step with its level, talent, rank and comment", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local out = strip(Display.SectionText(section, {}))
+  assert(out:find("10-11  Wand Specialization 2/2  - wanding", 1, true), out)
+  assert(out:find("15  Arcane Focus 1/5 or Arcane Subtlety 1/2", 1, true), out)
+end)
+
+test("reached steps are ticked, the next one is marked, unknown ones get a question mark", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0, ["Arcane Focus"] = 0, ["Arcane Subtlety"] = 0 })
+  local lines = {}
+  for l in (strip(Display.SectionText(section, { talents = ev })) .. "\n"):gmatch("(.-)\n") do lines[#lines + 1] = l end
+  local function starts(line, mark) return line:sub(1, #mark) == mark end
+  assert(starts(lines[1], Display.MARK_REACHED), lines[1])
+  assert(starts(lines[2], Display.MARK_NEXT), lines[2])
+  assert(starts(lines[4], Display.MARK_UNKNOWN), lines[4])
+end)
+
+test("off-plan points are listed under the path", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Improved Blizzard"] = 1 })
+  local out = strip(Display.SectionText(section, { talents = ev }))
+  assert(out:find("Off-plan", 1, true) and out:find("Improved Blizzard", 1, true), out)
+end)
+
+test("the next talent line names the talent, target rank and level", function()
+  local section = Parse(PATHTEXT).sections[1]
+  local ev = evaluate(section, { ["Wand Specialization"] = 2, ["Precision"] = 0 })
+  eq(strip(Display.NextTalent(section, ev)), "Next talent: Precision 1/3 (level 12)")
+end)
