@@ -12,6 +12,7 @@ Core\ImportReport.lua
 Core\Markup.lua
 Game\Main.lua
 Game\CopyBox.lua
+Game\LibraryView.lua
 Game\GuideWindow.lua
 Game\ImportBox.lua
 Game\Slash.lua

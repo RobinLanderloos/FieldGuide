@@ -17,11 +17,13 @@ function Library.New(db, char)
   return setmetatable({ db = db, char = char }, Library)
 end
 
+-- Returns key, "added" | "updated", previous guide (when updated).
 function Library:Add(guide)
   local key = Library.Key(guide)
+  local previous = self.db.guides[key]
   self.db.guides[key] = guide
   self.char.active = key
-  return key
+  return key, previous and "updated" or "added", previous
 end
 
 function Library:Get(key)
@@ -29,5 +31,28 @@ function Library:Get(key)
 end
 
 function Library:Active()
-  return self.char.active and self.db.guides[self.char.active]
+  return self.char.active and self.db.guides[self.char.active] or nil
+end
+
+function Library:SetActive(key)
+  if key == nil or self.db.guides[key] then self.char.active = key end
+end
+
+function Library:Delete(key)
+  self.db.guides[key] = nil
+  if self.char.active == key then self.char.active = nil end
+end
+
+-- Entries { key, guide }: guides of firstClass first, then by title and Variant.
+function Library:List(firstClass)
+  local list = {}
+  for key, guide in pairs(self.db.guides) do list[#list + 1] = { key = key, guide = guide } end
+  table.sort(list, function(a, b)
+    local ga, gb = a.guide, b.guide
+    local fa, fb = ga.class == firstClass, gb.class == firstClass
+    if fa ~= fb then return fa end
+    if ga.title ~= gb.title then return ga.title < gb.title end
+    return ga.variant < gb.variant
+  end)
+  return list
 end

@@ -19,6 +19,10 @@ function ImportReport.Import(text, library)
     end
     return false, lines
   end
-  library:Add(guide)
+  local _, status, previous = library:Add(guide)
+  if status == "updated" then
+    return true, { L.UPDATED:format(guide.title, guide.variant,
+      previous.updated or "?", guide.updated or "?", #guide.sections) }
+  end
   return true, { L.IMPORTED:format(guide.title, guide.variant, #guide.sections) }
 end

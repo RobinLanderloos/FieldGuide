@@ -6,8 +6,8 @@ ns.GuideWindow = GuideWindow
 
 local L = ns.L
 local LIST_W, ROW_H = 160, 22
-local frame, header, sub, link, status, content, text, empty
-local buttons, selected = {}, 1
+local frame, header, sub, link, guidesButton, status, scroll, content, text, empty, library
+local buttons, selected, mode = {}, 1, "guide"
 
 -- Section text as written; bullets get a proper dot.
 local function sectionText(section)
@@ -48,6 +48,20 @@ local function create()
     if guide then ns.CopyBox.Show(guide.url) end
   end)
 
+  guidesButton = CreateFrame("Button", "FieldGuideGuidesButton", frame, "UIPanelButtonTemplate")
+  guidesButton:SetSize(80, 22)
+  guidesButton:SetPoint("RIGHT", link, "LEFT", -4, 0)
+  guidesButton:SetText(L.GUIDES_BUTTON)
+  guidesButton:SetScript("OnClick", function()
+    mode = mode == "library" and "guide" or "library"
+    ns.LibraryView.Forget()
+    GuideWindow.Refresh()
+  end)
+
+  library = ns.LibraryView.Create(frame)
+  library:SetPoint("TOPLEFT", 16, -80)
+  library:SetPoint("BOTTOMRIGHT", -16, 32)
+
   status = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   status:SetPoint("BOTTOMLEFT", 16, 12)
   status:SetJustifyH("LEFT")
@@ -56,7 +70,7 @@ local function create()
   empty:SetPoint("CENTER")
   empty:SetText(L.NO_ACTIVE_GUIDE)
 
-  local scroll = CreateFrame("ScrollFrame", "FieldGuideContentScroll", frame, "UIPanelScrollFrameTemplate")
+  scroll = CreateFrame("ScrollFrame", "FieldGuideContentScroll", frame, "UIPanelScrollFrameTemplate")
   scroll:SetPoint("TOPLEFT", 16 + LIST_W + 12, -80)
   scroll:SetPoint("BOTTOMRIGHT", -32, 32)
   content = CreateFrame("Frame", "FieldGuideContent", scroll)
@@ -95,19 +109,35 @@ local function button(i)
   return b
 end
 
+local function showLibrary()
+  header:SetText(L.LIBRARY_TITLE)
+  sub:SetText("")
+  header:Show(); sub:Show()
+  library:Show()
+  local count = ns.LibraryView.Refresh(function()
+    mode, selected = "guide", 1
+    GuideWindow.Refresh()
+  end)
+  empty:SetShown(count == 0)
+end
+
 function GuideWindow.Refresh()
   if not frame then return end
   local guide = ns.library and ns.library:Active()
+  for _, b in ipairs(buttons) do b:Hide() end
+  library:Hide()
+  link:SetShown(guide and true or false)
+  if not guide and next(ns.library.db.guides) then mode = "library" end
+  scroll:SetShown(mode == "guide")
+  if mode == "library" then return showLibrary() end
+
   empty:SetShown(not guide)
   header:SetShown(guide and true or false)
   sub:SetShown(guide and true or false)
-  link:SetShown(guide and true or false)
-  for _, b in ipairs(buttons) do b:Hide() end
   if not guide then
     text:SetText("")
     return
   end
-
   header:SetText(guide.title)
   local parts = { guide.variant }
   if guide.author then parts[#parts + 1] = L.BY:format(guide.author) end
@@ -133,7 +163,7 @@ end
 
 function GuideWindow.Show()
   if not frame then create() end
-  selected = 1
+  selected, mode = 1, "guide"
   frame:Show()
   GuideWindow.Refresh()
 end

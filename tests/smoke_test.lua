@@ -193,6 +193,38 @@ if contentFrame and contentFrame.scripts.OnHyperlinkClick then
   copy:Hide()
 end
 
+-- Issue 003: the library.
+slash("FIELDGUIDE", "import")
+named("FieldGuideImportEditBox"):SetText((GOOD:gsub("Arcane Leveling Solo", "Arcane Leveling Group")))
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+check("a second Variant is imported and active", shownTexts():find("Arcane Leveling Group", 1, true) ~= nil, shownTexts())
+slash("FIELDGUIDE", "import")
+named("FieldGuideImportEditBox"):SetText((GOOD:gsub("Arcane Leveling Solo", "Arcane Leveling Group")))
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+check("re-importing reports an update", shownTexts():find("Updated", 1, true) ~= nil, shownTexts())
+
+local guidesButton = named("FieldGuideGuidesButton")
+check("the window has a Guides button", guidesButton and visible(guidesButton))
+guidesButton.scripts.OnClick(guidesButton)
+texts = shownTexts()
+check("the library lists both guides", select(2, texts:gsub("Arcane Mage Guide", "")) >= 2, texts)
+local row1 = named("FieldGuideLibraryRow1")
+check("library rows name title and Variant", row1 and row1.label and row1.label.text and row1.label.text:find("Arcane Leveling Group", 1, true), row1 and row1.label and row1.label.text)
+local use2 = named("FieldGuideLibraryUse2")
+use2.scripts.OnClick(use2)
+check("Use makes that guide active", FieldGuideCharDB.active and FieldGuideCharDB.active:find("Solo", 1, true) ~= nil, FieldGuideCharDB.active)
+check("Use returns to the guide", shownTexts():find("Arcane is fast.", 1, true) ~= nil, shownTexts())
+
+guidesButton.scripts.OnClick(guidesButton)
+local del1 = named("FieldGuideLibraryDelete1")
+del1.scripts.OnClick(del1)
+local count = 0; for _ in pairs(FieldGuideDB.guides) do count = count + 1 end
+check("the first Delete click only asks for confirmation", count == 2 and del1.text ~= "Delete", del1.text)
+del1.scripts.OnClick(del1)
+count = 0; for _ in pairs(FieldGuideDB.guides) do count = count + 1 end
+check("the second Delete click deletes", count == 1, count)
+check("the active Solo guide is still active", FieldGuideCharDB.active and FieldGuideCharDB.active:find("Solo", 1, true) ~= nil)
+
 -- A bad paste keeps the box open with the errors.
 slash("FIELDGUIDE", "import")
 named("FieldGuideImportEditBox"):SetText("!guide v1\ntitle: x")

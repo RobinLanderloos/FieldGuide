@@ -37,7 +37,7 @@
       "id": "003",
       "title": "Guide library: re-import, delete and choosing a Guide",
       "description": "Guides are identified by Source page URL + Variant. Re-importing the same pair replaces the Guide in place and the import result says Updated with the old and new dates. The Guide window lists library Guides (the character's class first), lets the character pick its Active guide, and deletes a Guide after an in-addon confirm. A character without an Active guide is offered Guides of its class.",
-      "status": "open",
+      "status": "done",
       "markdownFile": "docs/issues/003-guide-library-re-import-delete-and-choosing-a-guide.md",
       "acceptanceCriteria": [
         "Same URL + Variant replaces, different Variant adds",

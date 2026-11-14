@@ -5,7 +5,7 @@
 
 ## State
 
-Open
+Completed (passes outside the game; not yet seen in the live client)
 
 ## What to build
 
@@ -13,11 +13,11 @@ Guides are identified by Source page URL + Variant. Re-importing the same pair r
 
 ## Acceptance criteria
 
-- [ ] Same URL + Variant replaces, different Variant adds
-- [ ] Import result says Added or Updated (with dates)
-- [ ] Library list filters/sorts by class; picking sets the per-character Active guide
-- [ ] Delete asks for confirmation inside the addon (no StaticPopup) and clears Active guide references
-- [ ] Tests cover Library add/replace/delete/list
+- [x] Same URL + Variant replaces, different Variant adds
+- [x] Import result says Added or Updated (with dates)
+- [x] Library list filters/sorts by class; picking sets the per-character Active guide
+- [x] Delete asks for confirmation inside the addon (no StaticPopup) and clears Active guide references
+- [x] Tests cover Library add/replace/delete/list
 
 ## Blocked by
 
