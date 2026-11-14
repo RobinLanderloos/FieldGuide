@@ -84,3 +84,25 @@ function Library:PinState()
   self.char.pin = self.char.pin or {}
   return self.char.pin
 end
+
+-- The library grouped by class: { { class, entries = { {key, guide}, ... } } },
+-- firstClass first, then the other classes alphabetically. Entries within a
+-- class are ordered as in List.
+function Library:Groups(firstClass)
+  local groups, byClass = {}, {}
+  for _, entry in ipairs(self:List(firstClass)) do
+    local class = entry.guide.class
+    local group = byClass[class]
+    if not group then
+      group = { class = class, entries = {} }
+      byClass[class] = group
+      groups[#groups + 1] = group
+    end
+    group.entries[#group.entries + 1] = entry
+  end
+  table.sort(groups, function(a, b)
+    if (a.class == firstClass) ~= (b.class == firstClass) then return a.class == firstClass end
+    return a.class < b.class
+  end)
+  return groups
+end

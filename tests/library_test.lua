@@ -128,3 +128,27 @@ test("pin frame state is kept per character", function()
   lib:PinState().shown = true
   eq(Library.New({}, char):PinState().shown, true)
 end)
+
+test("guides are grouped by class, the given class first, then the others alphabetically", function()
+  local lib = Library.New({}, {})
+  local function add(class, variant, title)
+    local g = guide(variant); g.class = class; g.title = title or "T"; g.url = "https://" .. class .. ".test"
+    lib:Add(g)
+  end
+  add("WARRIOR", "Fury"); add("DRUID", "Feral"); add("MAGE", "Solo"); add("MAGE", "Group"); add("WARRIOR", "Arms")
+  local groups = lib:Groups("MAGE")
+  local out = {}
+  for _, group in ipairs(groups) do
+    local variants = {}
+    for _, e in ipairs(group.entries) do variants[#variants + 1] = e.guide.variant end
+    out[#out + 1] = group.class .. "=" .. table.concat(variants, ",")
+  end
+  eq(table.concat(out, " "), "MAGE=Group,Solo DRUID=Feral WARRIOR=Arms,Fury")
+end)
+
+test("a class without guides gets no group, not even the character's own", function()
+  local lib = Library.New({}, {})
+  lib:Add(guide())
+  local groups = lib:Groups("PRIEST")
+  eq(#groups, 1, "groups"); eq(groups[1].class, "MAGE", "class")
+end)

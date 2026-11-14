@@ -134,6 +134,8 @@ _G.GameTooltip.SetItemByID = function(_, id) tooltipShown = "item:" .. id end
 _G.GameTooltip.SetHyperlink = function(_, link) tooltipShown = link end
 _G.C_Spell.GetSpellInfo = function() return nil end
 _G.C_Item = { GetItemInfo = function() return nil end }
+_G.LOCALIZED_CLASS_NAMES_MALE = { MAGE = "Mage", WARRIOR = "Warrior", DRUID = "Druid" }
+_G.RAID_CLASS_COLORS = { MAGE = { colorStr = "ff3fc7eb" }, WARRIOR = { colorStr = "ffc69b6d" } }
 _G.FieldGuideDB = nil
 _G.FieldGuideCharDB = nil
 _G.UnitClass = function() return "Mage", "MAGE", 8 end
@@ -411,6 +413,29 @@ _G.UnitLevel = function() return 12 end
 local overview = named("FieldGuideSectionButton1")
 overview.scripts.OnClick(overview)
 check("the All levels toggle is hidden on other sections", not visible(allLevels))
+
+-- The Guides list is grouped by class, this character's class (Mage) first.
+slash("FIELDGUIDE", "import")
+named("FieldGuideImportEditBox"):SetText("!guide v1\ntitle: A Warrior Guide\nvariant: Fury\nclass: WARRIOR\nurl: https://w.test\n## Overview\nhi")
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+local warriorKey = FieldGuideCharDB.active
+ns.library:SetActive(nil)
+slash("FIELDGUIDE", "")
+if not visible(named("FieldGuideWindow")) then slash("FIELDGUIDE", "") end
+local h1, h2 = named("FieldGuideLibraryHeader1"), named("FieldGuideLibraryHeader2")
+check("class headings are shown", h1 and visible(h1) and h2 and visible(h2))
+check("this character's class comes first", h1 and h1.label.text:find("Mage", 1, true) and h2.label.text:find("Warrior", 1, true),
+  h1 and h1.label.text)
+local function top(w) return w and w.point and -w.point[5] or 0 end
+local mageRow = named("FieldGuideLibraryRow1")
+local warriorRow
+for i = 1, 5 do
+  local r = named("FieldGuideLibraryRow" .. i)
+  if r and visible(r) and r.label.text:find("A Warrior Guide", 1, true) then warriorRow = r end
+end
+check("guides sit under their class heading", warriorRow and top(h1) < top(mageRow) and top(mageRow) < top(h2) and top(h2) < top(warriorRow),
+  ("%s %s %s %s"):format(top(h1), top(mageRow), top(h2), top(warriorRow)))
+ns.library:Delete(warriorKey)
 
 -- A bad paste keeps the box open with the errors.
 slash("FIELDGUIDE", "import")
