@@ -15,6 +15,7 @@ Core\LevelingPath.lua
 Core\Display.lua
 Core\AIPrompt.lua
 Core\MinimapMath.lua
+Game\Skin.lua
 Game\Main.lua
 Game\Talents.lua
 Game\CopyBox.lua

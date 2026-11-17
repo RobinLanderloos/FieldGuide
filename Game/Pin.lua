@@ -25,12 +25,7 @@ local function create()
   else
     frame:SetPoint("RIGHT", -60, 0)
   end
-  if frame.SetBackdrop then
-    frame:SetBackdrop({ bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-      edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 12,
-      insets = { left = 3, right = 3, top = 3, bottom = 3 } })
-    frame:SetBackdropColor(0, 0, 0, 0.75)
-  end
+  ns.Skin.Panel(frame, { 0.075, 0.062, 0.05, 0.82 })
   frame:SetMovable(true)
   frame:SetResizable(true)
   if frame.SetResizeBounds then frame:SetResizeBounds(180, 80, 800, 900) end
@@ -41,12 +36,12 @@ local function create()
   frame:SetScript("OnDragStop", function() frame:StopMovingOrSizing(); savePosition() end)
   frame:Hide()
 
-  local close = CreateFrame("Button", "FieldGuidePinClose", frame, "UIPanelCloseButton")
-  close:SetSize(22, 22)
-  close:SetPoint("TOPRIGHT", 2, 2)
+  local close = ns.Skin.CloseButton(frame)
+  close:SetSize(18, 18)
+  close:SetPoint("TOPRIGHT", -3, -3)
   close:SetScript("OnClick", function() Pin.SetShown(false) end)
 
-  local link = CreateFrame("Button", "FieldGuidePinLink", frame, "UIPanelButtonTemplate")
+  local link = ns.Skin.Button(CreateFrame("Button", "FieldGuidePinLink", frame))
   link:SetSize(40, 18)
   link:SetPoint("RIGHT", close, "LEFT", -2, 0)
   link:SetText(L.LINK_BUTTON)
@@ -55,7 +50,7 @@ local function create()
     if guide then ns.CopyBox.Show(guide.url) end
   end)
 
-  nextToggle = CreateFrame("Button", "FieldGuidePinNextToggle", frame, "UIPanelButtonTemplate")
+  nextToggle = ns.Skin.Button(CreateFrame("Button", "FieldGuidePinNextToggle", frame))
   nextToggle:SetSize(46, 18)
   nextToggle:SetPoint("RIGHT", link, "LEFT", -2, 0)
   nextToggle:SetText(L.PIN_NEXT_TOGGLE)
@@ -70,6 +65,7 @@ local function create()
   titleText:SetPoint("RIGHT", nextToggle, "LEFT", -4, 0)
   titleText:SetJustifyH("LEFT")
   titleText:SetWordWrap(false)
+  titleText:SetTextColor(unpack(ns.Skin.accent))
   frame.titleText = titleText
 
   nextLine = frame:CreateFontString("FieldGuidePinNext", "OVERLAY", "GameFontHighlightSmall")
@@ -78,7 +74,8 @@ local function create()
   nextLine:SetJustifyH("LEFT")
 
   scroll = CreateFrame("ScrollFrame", "FieldGuidePinScroll", frame, "UIPanelScrollFrameTemplate")
-  scroll:SetPoint("BOTTOMRIGHT", -26, 8)
+  ns.Skin.ScrollBar(scroll)
+  scroll:SetPoint("BOTTOMRIGHT", -18, 8)
   content = CreateFrame("Frame", "FieldGuidePinContent", scroll)
   content:SetSize(260, 10)
   ns.References.Attach(content)
@@ -96,10 +93,8 @@ local function create()
 
   -- Resize grip; re-anchor top-left first so the frame follows the mouse.
   local grip = CreateFrame("Button", nil, frame)
-  grip:SetSize(14, 14)
+  ns.Skin.Grip(grip)
   grip:SetPoint("BOTTOMRIGHT", -2, 2)
-  grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
-  grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
   grip:SetScript("OnMouseDown", function()
     local left, top = frame:GetLeft(), frame:GetTop()
     frame:ClearAllPoints()
@@ -134,7 +129,7 @@ function Pin.Refresh()
 
   scroll:ClearAllPoints()
   scroll:SetPoint("TOPLEFT", 8, next and -44 or -26)
-  scroll:SetPoint("BOTTOMRIGHT", -26, 8)
+  scroll:SetPoint("BOTTOMRIGHT", -18, 8)
   hint:SetShown(not section and not next)
   text:SetText(section and ns.Display.SectionText(section, {
     level = UnitLevel("player"),

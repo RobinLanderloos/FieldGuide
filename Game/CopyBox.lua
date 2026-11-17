@@ -9,7 +9,7 @@ local L = ns.L
 local frame, edit, current
 
 local function create()
-  frame = CreateFrame("Frame", "FieldGuideCopyBox", UIParent, "BasicFrameTemplateWithInset")
+  frame = ns.Skin.Window(CreateFrame("Frame", "FieldGuideCopyBox", UIParent))
   frame:SetSize(460, 96)
   frame:SetPoint("CENTER", 0, 120)
   frame:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -18,7 +18,7 @@ local function create()
   tinsert(UISpecialFrames, "FieldGuideCopyBox")
   if frame.TitleText then frame.TitleText:SetText(L.COPY_TITLE) end
 
-  edit = CreateFrame("EditBox", "FieldGuideCopyEditBox", frame, "InputBoxTemplate")
+  edit = ns.Skin.Input(CreateFrame("EditBox", "FieldGuideCopyEditBox", frame))
   edit:SetSize(420, 24)
   edit:SetPoint("TOP", 0, -34)
   edit:SetAutoFocus(false)
@@ -51,7 +51,7 @@ end
 local big, bigEdit, bigText
 
 local function createBig()
-  big = CreateFrame("Frame", "FieldGuidePromptBox", UIParent, "BasicFrameTemplateWithInset")
+  big = ns.Skin.Window(CreateFrame("Frame", "FieldGuidePromptBox", UIParent))
   big:SetSize(560, 440)
   big:SetPoint("CENTER", 0, 40)
   big:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -68,14 +68,17 @@ local function createBig()
   hint:SetText(L.PROMPT_HINT)
 
   local scroll = CreateFrame("ScrollFrame", "FieldGuidePromptScroll", big, "UIPanelScrollFrameTemplate")
+  ns.Skin.ScrollBar(scroll)
   scroll:SetPoint("TOPLEFT", 16, -32)
-  scroll:SetPoint("BOTTOMRIGHT", -34, 32)
+  scroll:SetPoint("BOTTOMRIGHT", -24, 32)
+  ns.Skin.Panel(scroll, ns.Skin.colors.input)
   bigEdit = CreateFrame("EditBox", "FieldGuidePromptEditBox", scroll)
   bigEdit:SetMultiLine(true)
   bigEdit:SetAutoFocus(false)
   bigEdit:SetMaxLetters(0)
   bigEdit:SetFontObject(ChatFontNormal)
   bigEdit:SetWidth(500)
+  bigEdit:SetTextInsets(6, 6, 6, 6)
   bigEdit:SetScript("OnTextChanged", function(self, userInput)
     if userInput then self:SetText(bigText); self:HighlightText() end
   end)
