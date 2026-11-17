@@ -1,6 +1,6 @@
 -- The guide library inside the Guide window, grouped under class headings
--- (this character's class first): one row per Guide with Use and Delete
--- (Delete asks once more before deleting; no game popup).
+-- (this character's class first): one row per Guide with View, Rename, Use
+-- and Delete (Delete asks once more before deleting; no game popup).
 local addonName, ns = ...
 
 local LibraryView = {}
@@ -50,7 +50,7 @@ local function row(i)
   r:SetHeight(ROW_H)
   r.label = r:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   r.label:SetPoint("LEFT", 14, 0)
-  r.label:SetPoint("RIGHT", -250, 0)
+  r.label:SetPoint("RIGHT", -310, 0)
   r.label:SetJustifyH("LEFT")
   r.label:SetWordWrap(false)
   r.use = CreateFrame("Button", "FieldGuideLibraryUse" .. i, r, "UIPanelButtonTemplate")
@@ -64,10 +64,14 @@ local function row(i)
   r.rename:SetSize(76, 22)
   r.rename:SetPoint("RIGHT", -162, 0)
   r.rename:SetText(L.RENAME)
+  r.view = CreateFrame("Button", "FieldGuideLibraryView" .. i, r, "UIPanelButtonTemplate")
+  r.view:SetSize(60, 22)
+  r.view:SetPoint("RIGHT", -242, 0)
+  r.view:SetText(L.VIEW)
   r.edit = CreateFrame("EditBox", "FieldGuideLibraryNameEdit" .. i, r, "InputBoxTemplate")
   r.edit:SetHeight(22)
   r.edit:SetPoint("LEFT", 18, 0)
-  r.edit:SetPoint("RIGHT", -250, 0)
+  r.edit:SetPoint("RIGHT", -310, 0)
   r.edit:SetAutoFocus(false)
   r.edit:SetMaxLetters(60)
   r.edit:Hide()
@@ -81,8 +85,9 @@ function LibraryView.Create(parent)
   return panel
 end
 
--- onUse(key) is called after a guide is chosen.
-function LibraryView.Refresh(onUse)
+-- onUse(key) is called after a guide is chosen; onView(key) when one is
+-- opened for reading without making it active.
+function LibraryView.Refresh(onUse, onView)
   local lib = ns.library
   local _, class = UnitClass("player")
   for _, r in ipairs(rows) do r:Hide() end
@@ -104,6 +109,10 @@ function LibraryView.Refresh(onUse)
         lib:SetActive(key)
         onUse(key)
       end)
+      r.view:SetScript("OnClick", function()
+        pending, renaming = nil, nil
+        onView(key)
+      end)
       local editing = renaming == key
       r.label:SetShown(not editing)
       r.edit:SetShown(editing)
@@ -116,11 +125,11 @@ function LibraryView.Refresh(onUse)
       r.edit:SetScript("OnEnterPressed", function(self)
         renaming = nil
         lib:Rename(key, ((self:GetText() or ""):gsub("||", "|")))
-        LibraryView.Refresh(onUse)
+        LibraryView.Refresh(onUse, onView)
       end)
       r.edit:SetScript("OnEscapePressed", function()
         renaming = nil
-        LibraryView.Refresh(onUse)
+        LibraryView.Refresh(onUse, onView)
       end)
       r.rename:SetText(editing and L.SAVE or L.RENAME)
       r.rename:SetScript("OnClick", function()
@@ -130,7 +139,7 @@ function LibraryView.Refresh(onUse)
         else
           renaming, pending = key, nil
         end
-        LibraryView.Refresh(onUse)
+        LibraryView.Refresh(onUse, onView)
       end)
       r.delete:SetText(pending == key and L.CONFIRM_DELETE or L.DELETE)
       r.delete:SetScript("OnClick", function()
@@ -140,7 +149,7 @@ function LibraryView.Refresh(onUse)
         else
           pending = key
         end
-        LibraryView.Refresh(onUse)
+        LibraryView.Refresh(onUse, onView)
       end)
       y = place(r, y, ROW_H)
     end

@@ -450,6 +450,22 @@ check("Use makes that guide active", FieldGuideCharDB.active and FieldGuideCharD
 check("Use returns to the guide", shownTexts():find("Arcane is fast.", 1, true) ~= nil, shownTexts())
 
 guidesButton.scripts.OnClick(guidesButton)
+local view1 = named("FieldGuideLibraryView1")
+check("library rows have a View button", view1 and visible(view1))
+view1.scripts.OnClick(view1)
+texts = shownTexts()
+check("View shows that guide", texts:find("Arcane Leveling Group", 1, true) and texts:find("Arcane is fast.", 1, true), texts)
+check("View leaves the active guide alone", FieldGuideCharDB.active:find("Solo", 1, true) ~= nil, FieldGuideCharDB.active)
+local windowUse = named("FieldGuideWindowUseButton")
+check("a viewed guide offers Use instead of Pin", visible(windowUse) and not visible(named("FieldGuidePinButton")))
+windowUse.scripts.OnClick(windowUse)
+check("Use in the window makes the viewed guide active", FieldGuideCharDB.active:find("Group", 1, true) ~= nil and not visible(windowUse)
+  and visible(named("FieldGuidePinButton")), FieldGuideCharDB.active)
+guidesButton.scripts.OnClick(guidesButton)
+use2 = named("FieldGuideLibraryUse2")
+use2.scripts.OnClick(use2)
+
+guidesButton.scripts.OnClick(guidesButton)
 local del1 = named("FieldGuideLibraryDelete1")
 del1.scripts.OnClick(del1)
 local count = 0; for _ in pairs(FieldGuideDB.guides) do count = count + 1 end

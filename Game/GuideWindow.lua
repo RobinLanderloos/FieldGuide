@@ -8,9 +8,22 @@ local L = ns.L
 local LIST_W, ROW_H = 160, 22
 local LIST_BAR = 14 -- room taken from the list for its scroll bar
 local listScroll, listChild
-local frame, header, sub, link, pinButton, importButton, guidesButton, status, scroll, content, text, empty, library
+local frame, header, sub, link, pinButton, useButton, importButton, guidesButton, status, scroll, content, text, empty, library
 local buttons, selected, mode, showAll = {}, 1, "guide", false
 local allLevels
+local viewKey -- a guide opened from the library for reading; nil = the active guide
+
+-- The guide the window shows: the one being viewed, else the active one.
+local function shownGuide()
+  local lib = ns.library
+  if not lib then return nil end
+  return viewKey and lib:Get(viewKey) or lib:Active()
+end
+
+local function viewingOther()
+  local guide = shownGuide()
+  return guide ~= nil and guide ~= ns.library:Active()
+end
 
 local function create()
   frame = CreateFrame("Frame", "FieldGuideWindow", UIParent, "BasicFrameTemplateWithInset")
@@ -38,7 +51,7 @@ local function create()
   link:SetPoint("TOPRIGHT", -14, -32)
   link:SetText(L.LINK_BUTTON)
   link:SetScript("OnClick", function()
-    local guide = ns.library and ns.library:Active()
+    local guide = shownGuide()
     if guide then ns.CopyBox.Show(guide.url) end
   end)
 
@@ -87,6 +100,16 @@ local function create()
   pinButton:SetSize(60, 22)
   pinButton:SetPoint("RIGHT", importButton, "LEFT", -4, 0)
   pinButton:SetText(L.PIN_BUTTON)
+  -- While viewing another guide, Use takes the Pin button's place.
+  useButton = CreateFrame("Button", "FieldGuideWindowUseButton", frame, "UIPanelButtonTemplate")
+  useButton:SetSize(60, 22)
+  useButton:SetPoint("RIGHT", importButton, "LEFT", -4, 0)
+  useButton:SetText(L.USE)
+  useButton:SetScript("OnClick", function()
+    if viewKey then ns.library:SetActive(viewKey) end
+    viewKey = nil
+    GuideWindow.Refresh()
+  end)
   -- Title and subtitle stop short of the header buttons.
   header:SetPoint("RIGHT", pinButton, "LEFT", -8, 0)
   header:SetWordWrap(false)
@@ -167,7 +190,10 @@ local function showLibrary()
   header:Show(); sub:Show()
   library:Show()
   local count = ns.LibraryView.Refresh(function()
-    mode, selected = "guide", 1
+    mode, selected, viewKey = "guide", 1, nil
+    GuideWindow.Refresh()
+  end, function(key)
+    mode, selected, viewKey = "guide", 1, key
     GuideWindow.Refresh()
   end)
   empty:SetShown(count == 0)
@@ -175,12 +201,15 @@ end
 
 function GuideWindow.Refresh()
   if not frame then return end
-  local guide = ns.library and ns.library:Active()
+  local guide = shownGuide()
+  local other = viewingOther()
+  if not other then viewKey = nil end
   for _, b in ipairs(buttons) do b:Hide() end
   library:Hide()
   allLevels:Hide()
   link:SetShown(guide and true or false)
-  pinButton:SetShown(guide and mode == "guide" or false)
+  pinButton:SetShown(guide and mode == "guide" and not other or false)
+  useButton:SetShown(mode == "guide" and other)
   if not guide and next(ns.library.db.guides) then mode = "library" end
   scroll:SetShown(mode == "guide")
   listScroll:SetShown(mode == "guide" and guide and true or false)
@@ -196,6 +225,7 @@ function GuideWindow.Refresh()
   local function esc(t) return (t:gsub("|", "||")) end
   header:SetText(esc(ns.Library.DisplayName(guide)))
   local parts = { esc(guide.variant) }
+  if other then table.insert(parts, 1, L.NOT_IN_USE) end
   if guide.customName then parts[#parts + 1] = esc(guide.title) end
   if guide.author then parts[#parts + 1] = L.BY:format(esc(guide.author)) end
   if guide.updated then parts[#parts + 1] = L.UPDATED_ON:format(guide.updated) end
@@ -225,7 +255,7 @@ end
 
 function GuideWindow.Show()
   if not frame then create() end
-  selected, mode = 1, "guide"
+  selected, mode, viewKey = 1, "guide", nil
   frame:Show()
   GuideWindow.Refresh()
 end
