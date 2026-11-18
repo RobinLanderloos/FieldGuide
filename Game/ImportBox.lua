@@ -5,14 +5,14 @@ local ImportBox = {}
 ns.ImportBox = ImportBox
 
 local L = ns.L
-local frame, edit, nameBox, result
+local frame, edit, nameBox, result, hint, replaceKey
 
 local function import()
   -- The client's edit box escapes a pasted "|" as "||"; read it back as written.
   local pasted = (edit:GetText():gsub("||", "|"))
   local name = ((nameBox:GetText() or ""):gsub("||", "|"))
   local ok, lines = ns.ImportReport.Import(pasted, ns.library,
-    { class = ns.Talents.PlayerClass(), live = ns.Talents.Live() }, name)
+    { class = ns.Talents.PlayerClass(), live = ns.Talents.Live() }, name, replaceKey)
   if ok then
     edit:SetText("")
     nameBox:SetText("")
@@ -38,11 +38,12 @@ local function create()
   frame:SetFrameStrata("DIALOG")
   frame:Hide()
   tinsert(UISpecialFrames, "FieldGuideImportBox")
-  if frame.TitleText then frame.TitleText:SetText(L.IMPORT_TITLE) end
 
-  local hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+  hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   hint:SetPoint("TOPLEFT", 16, -32)
-  hint:SetText(L.IMPORT_HINT)
+  hint:SetPoint("RIGHT", -16, 0)
+  hint:SetJustifyH("LEFT")
+  hint:SetWordWrap(false)
 
   local scroll = CreateFrame("ScrollFrame", "FieldGuideImportScroll", frame, "UIPanelScrollFrameTemplate")
   ns.Skin.ScrollBar(scroll)
@@ -96,8 +97,14 @@ local function create()
   prompt:SetScript("OnClick", function() ns.CopyBox.ShowText(L.PROMPT_TITLE, ns.AIPrompt.TEXT) end)
 end
 
-function ImportBox.Show()
+-- key (optional): the library guide this import updates (Update button).
+function ImportBox.Show(key)
   if not frame then create() end
+  local target = key and ns.library:Get(key)
+  replaceKey = target and key or nil
+  if frame.TitleText then frame.TitleText:SetText(target and L.UPDATE_TITLE or L.IMPORT_TITLE) end
+  hint:SetText(target and L.UPDATE_HINT:format((ns.Library.DisplayName(target):gsub("|", "||")))
+    or L.IMPORT_HINT)
   result:SetText("")
   frame:Show()
   edit:SetFocus()

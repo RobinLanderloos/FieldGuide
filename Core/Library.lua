@@ -22,20 +22,64 @@ function Library.DisplayName(guide)
   return guide.customName or guide.title
 end
 
--- Returns key, "added" | "updated", previous guide (when updated).
--- customName (optional) is a display name; blank keeps the previous one.
-function Library:Add(guide, customName)
-  local key = Library.Key(guide)
-  local previous = self.db.guides[key]
+local function applyName(guide, customName, previous)
   customName = customName and customName:match("^%s*(.-)%s*$")
   if customName and customName ~= "" then
     guide.customName = customName
   elseif previous then
     guide.customName = previous.customName
   end
+end
+
+-- Returns key, "added" | "updated", previous guide (when updated).
+-- customName (optional) is a display name; blank keeps the previous one.
+function Library:Add(guide, customName)
+  local key = Library.Key(guide)
+  local previous = self.db.guides[key]
+  applyName(guide, customName, previous)
   self.db.guides[key] = guide
   self:setActive(key)
   return key, previous and "updated" or "added", previous
+end
+
+-- Stores guide in place of the guide at oldKey, even when its Source page or
+-- Variant changed (an updated guide). Characters that had the old guide active
+-- or pinned follow it (db.moved). Returns like Add.
+function Library:Replace(oldKey, guide, customName)
+  local previous = self.db.guides[oldKey]
+  if not previous then return self:Add(guide, customName) end
+  local key = Library.Key(guide)
+  if key ~= oldKey then
+    self.db.guides[oldKey] = nil
+    self.db.moved = self.db.moved or {}
+    self.db.moved[key] = nil
+    self.db.moved[oldKey] = key
+  end
+  applyName(guide, customName, previous)
+  self.db.guides[key] = guide
+  self:follow()
+  self:setActive(key)
+  return key, "updated", previous
+end
+
+-- Where a guide went after updates (nil when it is gone).
+function Library:resolve(key)
+  local moved, steps = self.db.moved or {}, 0
+  while key and not self.db.guides[key] and steps < 50 do
+    key, steps = moved[key], steps + 1
+  end
+  return key and self.db.guides[key] and key or nil
+end
+
+-- Points this character's active guide and Pin at updated guides.
+function Library:follow()
+  local active = self.char.active
+  if not active or self.db.guides[active] then return end
+  local key = self:resolve(active)
+  if not key then return end
+  self.char.active = key
+  local pin = self.char.pin
+  if pin and pin.guide == active then pin.guide = key end
 end
 
 function Library:Get(key)
@@ -43,6 +87,7 @@ function Library:Get(key)
 end
 
 function Library:Active()
+  self:follow()
   return self.char.active and self.db.guides[self.char.active] or nil
 end
 
@@ -59,6 +104,9 @@ end
 
 function Library:Delete(key)
   self.db.guides[key] = nil
+  for from, to in pairs(self.db.moved or {}) do
+    if to == key then self.db.moved[from] = nil end
+  end
   if self.char.active == key then self.char.active = nil end
 end
 

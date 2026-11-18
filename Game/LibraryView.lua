@@ -1,6 +1,6 @@
 -- The guide library inside the Guide window, grouped under class headings
--- (this character's class first): one row per Guide with View, Rename, Use
--- and Delete (Delete asks once more before deleting; no game popup).
+-- (this character's class first): one row per Guide with View, Update,
+-- Rename, Use and Delete (Delete asks once more before deleting; no game popup).
 local addonName, ns = ...
 
 local LibraryView = {}
@@ -50,7 +50,7 @@ local function row(i)
   r:SetHeight(ROW_H)
   r.label = r:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
   r.label:SetPoint("LEFT", 14, 0)
-  r.label:SetPoint("RIGHT", -310, 0)
+  r.label:SetPoint("RIGHT", -384, 0)
   r.label:SetJustifyH("LEFT")
   r.label:SetWordWrap(false)
   r.use = ns.Skin.Button(CreateFrame("Button", "FieldGuideLibraryUse" .. i, r))
@@ -66,12 +66,16 @@ local function row(i)
   r.rename:SetText(L.RENAME)
   r.view = ns.Skin.Button(CreateFrame("Button", "FieldGuideLibraryView" .. i, r))
   r.view:SetSize(60, 22)
-  r.view:SetPoint("RIGHT", -242, 0)
+  r.view:SetPoint("RIGHT", -316, 0)
   r.view:SetText(L.VIEW)
+  r.update = ns.Skin.Button(CreateFrame("Button", "FieldGuideLibraryUpdate" .. i, r))
+  r.update:SetSize(70, 22)
+  r.update:SetPoint("RIGHT", -242, 0)
+  r.update:SetText(L.UPDATE)
   r.edit = ns.Skin.Input(CreateFrame("EditBox", "FieldGuideLibraryNameEdit" .. i, r))
   r.edit:SetHeight(22)
   r.edit:SetPoint("LEFT", 18, 0)
-  r.edit:SetPoint("RIGHT", -310, 0)
+  r.edit:SetPoint("RIGHT", -384, 0)
   r.edit:SetAutoFocus(false)
   r.edit:SetMaxLetters(60)
   r.edit:Hide()
@@ -112,6 +116,10 @@ function LibraryView.Refresh(onUse, onView)
       r.view:SetScript("OnClick", function()
         pending, renaming = nil, nil
         onView(key)
+      end)
+      r.update:SetScript("OnClick", function()
+        pending, renaming = nil, nil
+        ns.ImportBox.Show(key)
       end)
       local editing = renaming == key
       r.label:SetShown(not editing)

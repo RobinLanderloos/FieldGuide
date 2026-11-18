@@ -33,8 +33,10 @@ end
 
 -- context (optional): { class = player's class token, live = live talents }.
 -- customName (optional): the player's name for the guide.
+-- replaceKey (optional): the guide this import updates, even when its Source
+-- page or Variant changed.
 -- Returns ok, lines.
-function ImportReport.Import(text, library, context, customName)
+function ImportReport.Import(text, library, context, customName, replaceKey)
   local L = ns.L
   if not text or not text:find("%S") then
     return false, { L.NOTHING_TO_IMPORT }
@@ -47,7 +49,12 @@ function ImportReport.Import(text, library, context, customName)
     end
     return false, lines
   end
-  local _, status, previous = library:Add(guide, customName)
+  local _, status, previous
+  if replaceKey then
+    _, status, previous = library:Replace(replaceKey, guide, customName)
+  else
+    _, status, previous = library:Add(guide, customName)
+  end
   local lines
   local title, variant = escape(ns.Library.DisplayName(guide)), escape(guide.variant)
   if status == "updated" then

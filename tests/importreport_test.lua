@@ -91,3 +91,15 @@ test("re-importing without a name keeps the custom name; a new name replaces it"
   ImportReport.Import(GOOD, lib, nil, "  Arcane v2 ")
   eq(ns.Library.DisplayName(lib:Active()), "Arcane v2", "replaced and trimmed")
 end)
+
+test("an import aimed at an existing guide replaces it even when the Variant differs", function()
+  local lib = ns.Library.New({}, {})
+  local other = GOOD:gsub("variant: [^\n]*", "variant: Old Variant")
+  ImportReport.Import(other, lib, nil, "My Arcane")
+  local oldKey = lib.char.active
+  local ok, lines = ImportReport.Import(GOOD, lib, nil, "", oldKey)
+  eq(ok, true, "ok")
+  eq(#lib:List(), 1, "one guide")
+  eq(ns.Library.DisplayName(lib:Active()), "My Arcane", "name kept")
+  assert(lines[1]:find("^Updated"), lines[1])
+end)

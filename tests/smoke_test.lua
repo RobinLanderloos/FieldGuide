@@ -465,6 +465,29 @@ guidesButton.scripts.OnClick(guidesButton)
 use2 = named("FieldGuideLibraryUse2")
 use2.scripts.OnClick(use2)
 
+-- Update: an import aimed at a library guide replaces it, even with a new Variant.
+guidesButton.scripts.OnClick(guidesButton)
+local update1 = named("FieldGuideLibraryUpdate1")
+check("library rows have an Update button", update1 and visible(update1))
+update1.scripts.OnClick(update1)
+check("Update opens the import box naming the guide", visible(named("FieldGuideImportBox"))
+  and shownTexts():find("Update a guide", 1, true) ~= nil, shownTexts())
+named("FieldGuideImportEditBox"):SetText((GOOD:gsub("Arcane Leveling Solo", "Arcane Leveling Group v2")))
+named("FieldGuideImportButton").scripts.OnClick(named("FieldGuideImportButton"))
+local updatedCount, hasV2 = 0, false
+for key in pairs(FieldGuideDB.guides) do
+  updatedCount = updatedCount + 1
+  if key:find("Group v2", 1, true) then hasV2 = true end
+end
+check("Update replaces the guide instead of adding one", updatedCount == 2 and hasV2, updatedCount)
+check("the updated guide becomes active", FieldGuideCharDB.active:find("Group v2", 1, true) ~= nil, FieldGuideCharDB.active)
+ok, out = slash("FIELDGUIDE", "import")
+check("a plain import afterwards is not aimed at a guide", shownTexts():find("Import a guide", 1, true) ~= nil, shownTexts())
+named("FieldGuideImportBox"):Hide()
+guidesButton.scripts.OnClick(guidesButton)
+use2 = named("FieldGuideLibraryUse2")
+use2.scripts.OnClick(use2)
+
 guidesButton.scripts.OnClick(guidesButton)
 local del1 = named("FieldGuideLibraryDelete1")
 del1.scripts.OnClick(del1)
