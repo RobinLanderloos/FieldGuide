@@ -60,7 +60,7 @@ local function dock()
   docked = target
   if target then
     panel:ClearAllPoints()
-    panel:SetPoint("TOPLEFT", target, "TOPRIGHT", 4, 0)
+    panel:SetPoint("TOPLEFT", target, "TOPRIGHT", 10, 0)
   end
   TalentPanel.Refresh()
 end
