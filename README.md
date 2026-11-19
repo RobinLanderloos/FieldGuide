@@ -23,6 +23,14 @@ WoW Forever addon: your class guide in-game. Sections, a talent plan that ticks 
 - `/guide debug`: save a diagnostic report
 - Key bindings: Key Bindings > AddOns > FieldGuide
 
+## Screenshots
+
+![A guide open on its Overview page](.previews/guide-overview.png)
+
+![The Talents page of a guide, level by level](.previews/guide-talents.png)
+
+![The talent panel docked beside the talent window, showing the next picks](.previews/talent-panel.png)
+
 ## Development
 
 The format and decisions are in `docs/adr/` and `docs/prd/`; the vocabulary in `CONTEXT.md`. Tests (from the repo root): `luajit tests/run.lua` and `luajit tests/smoke_test.lua`. Check a converted guide with `luajit tools/validate.lua <file>`. After editing `Core/AIPrompt.lua`, run `luajit tools/print_prompt.lua` to refresh `AI_PROMPT.txt`.
