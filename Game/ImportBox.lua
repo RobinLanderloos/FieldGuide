@@ -27,7 +27,7 @@ local function import()
 end
 
 local function create()
-  frame = ns.Skin.Window(CreateFrame("Frame", "FieldGuideImportBox", UIParent))
+  frame = ns.Skin.Window(ns.Skin.Create("Frame", "FieldGuideImportBox", UIParent, ns.Skin.TEMPLATES.Window))
   frame:SetSize(520, 460)
   frame:SetPoint("CENTER", 0, 40)
   frame:SetMovable(true)
@@ -69,14 +69,14 @@ local function create()
   result:SetJustifyV("TOP")
   result:SetHeight(60)
 
-  local button = ns.Skin.Button(CreateFrame("Button", "FieldGuideImportButton", frame))
+  local button = ns.Skin.Button(ns.Skin.Create("Button", "FieldGuideImportButton", frame, ns.Skin.TEMPLATES.Button))
   button:SetSize(120, 24)
   button:SetPoint("BOTTOMRIGHT", -16, 12)
   button:SetText(L.IMPORT_BUTTON)
   button:SetScript("OnClick", import)
 
   -- Optional display name for the guide (ADR 0003: identity stays URL + Variant).
-  nameBox = ns.Skin.Input(CreateFrame("EditBox", "FieldGuideImportNameBox", frame))
+  nameBox = ns.Skin.Input(ns.Skin.Create("EditBox", "FieldGuideImportNameBox", frame, ns.Skin.TEMPLATES.Input))
   -- Its own row above the buttons, label on the left, field filling the rest.
   nameBox:SetHeight(22)
   nameBox:SetPoint("BOTTOMLEFT", 132, 46)
@@ -90,7 +90,7 @@ local function create()
   nameLabel:SetJustifyH("RIGHT")
   nameLabel:SetText(L.IMPORT_NAME)
 
-  local prompt = ns.Skin.Button(CreateFrame("Button", "FieldGuideImportPromptButton", frame))
+  local prompt = ns.Skin.Button(ns.Skin.Create("Button", "FieldGuideImportPromptButton", frame, ns.Skin.TEMPLATES.Button))
   prompt:SetSize(120, 24)
   prompt:SetPoint("BOTTOMLEFT", 16, 12)
   prompt:SetText(L.PROMPT_BUTTON)

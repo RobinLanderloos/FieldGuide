@@ -41,7 +41,7 @@ local function create()
   close:SetPoint("TOPRIGHT", -3, -3)
   close:SetScript("OnClick", function() Pin.SetShown(false) end)
 
-  local link = ns.Skin.Button(CreateFrame("Button", "FieldGuidePinLink", frame))
+  local link = ns.Skin.Button(ns.Skin.Create("Button", "FieldGuidePinLink", frame, ns.Skin.TEMPLATES.Button))
   link:SetSize(40, 18)
   link:SetPoint("RIGHT", close, "LEFT", -2, 0)
   link:SetText(L.LINK_BUTTON)
@@ -50,7 +50,7 @@ local function create()
     if guide then ns.CopyBox.Show(guide.url) end
   end)
 
-  nextToggle = ns.Skin.Button(CreateFrame("Button", "FieldGuidePinNextToggle", frame))
+  nextToggle = ns.Skin.Button(ns.Skin.Create("Button", "FieldGuidePinNextToggle", frame, ns.Skin.TEMPLATES.Button))
   nextToggle:SetSize(46, 18)
   nextToggle:SetPoint("RIGHT", link, "LEFT", -2, 0)
   nextToggle:SetText(L.PIN_NEXT_TOGGLE)

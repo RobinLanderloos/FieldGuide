@@ -14,7 +14,7 @@ local TARGETS = { "EUI_ClassicTalents", "PlayerSpellsFrame", "ClassTalentFrame",
 local panel, title, body, docked, dirty
 
 local function create()
-  panel = ns.Skin.Window(CreateFrame("Frame", "FieldGuideTalentPanel", UIParent))
+  panel = ns.Skin.Window(ns.Skin.Create("Frame", "FieldGuideTalentPanel", UIParent, ns.Skin.TEMPLATES.Window))
   panel:SetWidth(WIDTH)
   panel:SetHeight(200)
   panel:SetFrameStrata("HIGH")

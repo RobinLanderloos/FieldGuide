@@ -9,7 +9,7 @@ local L = ns.L
 local frame, edit, current
 
 local function create()
-  frame = ns.Skin.Window(CreateFrame("Frame", "FieldGuideCopyBox", UIParent))
+  frame = ns.Skin.Window(ns.Skin.Create("Frame", "FieldGuideCopyBox", UIParent, ns.Skin.TEMPLATES.Window))
   frame:SetSize(460, 96)
   frame:SetPoint("CENTER", 0, 120)
   frame:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -18,7 +18,7 @@ local function create()
   tinsert(UISpecialFrames, "FieldGuideCopyBox")
   if frame.TitleText then frame.TitleText:SetText(L.COPY_TITLE) end
 
-  edit = ns.Skin.Input(CreateFrame("EditBox", "FieldGuideCopyEditBox", frame))
+  edit = ns.Skin.Input(ns.Skin.Create("EditBox", "FieldGuideCopyEditBox", frame, ns.Skin.TEMPLATES.Input))
   edit:SetSize(420, 24)
   edit:SetPoint("TOP", 0, -34)
   edit:SetAutoFocus(false)
@@ -51,7 +51,7 @@ end
 local big, bigEdit, bigText
 
 local function createBig()
-  big = ns.Skin.Window(CreateFrame("Frame", "FieldGuidePromptBox", UIParent))
+  big = ns.Skin.Window(ns.Skin.Create("Frame", "FieldGuidePromptBox", UIParent, ns.Skin.TEMPLATES.Window))
   big:SetSize(560, 440)
   big:SetPoint("CENTER", 0, 40)
   big:SetFrameStrata("FULLSCREEN_DIALOG")
