@@ -89,7 +89,7 @@ local function create()
 
   library = ns.LibraryView.Create(frame)
   library:SetPoint("TOPLEFT", 16, -80)
-  library:SetPoint("BOTTOMRIGHT", -16, 32)
+  library:SetPoint("BOTTOMRIGHT", -16 - 22, 32) -- room for its scroll bar
 
   importButton = ns.Skin.Button(ns.Skin.Create("Button", "FieldGuideWindowImportButton", frame, ns.Skin.TEMPLATES.Button))
   importButton:SetSize(70, 22)

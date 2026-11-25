@@ -9,7 +9,7 @@ ns.LibraryView = LibraryView
 local L = ns.L
 local ROW_H = 26
 local HEADER_H = 24
-local panel, rows, headers, pending, renaming = nil, {}, {}, nil, nil
+local scroll, panel, rows, headers, pending, renaming = nil, nil, {}, {}, nil, nil
 
 local function header(i)
   if headers[i] then return headers[i] end
@@ -83,10 +83,28 @@ local function row(i)
   return r
 end
 
+-- The rows sit in a scroll frame so a long library scrolls instead of
+-- running past the window's bottom edge.
 function LibraryView.Create(parent)
-  panel = CreateFrame("Frame", "FieldGuideLibrary", parent)
-  panel:Hide()
-  return panel
+  scroll = CreateFrame("ScrollFrame", "FieldGuideLibrary", parent, "UIPanelScrollFrameTemplate")
+  ns.Skin.ScrollBar(scroll)
+  panel = CreateFrame("Frame", "FieldGuideLibraryRows", scroll)
+  panel:SetSize(400, 10)
+  scroll:SetScrollChild(panel)
+  scroll:SetScript("OnSizeChanged", function(_, w) panel:SetWidth(w) end)
+  scroll:Hide()
+  return scroll
+end
+
+-- Shows the scroll bar only when the rows don't fit.
+local function fit(height)
+  local w = scroll:GetWidth() or 0
+  if w > 0 then panel:SetWidth(w) end
+  panel:SetHeight(math.max(10, height))
+  local bar = scroll.ScrollBar or _G["FieldGuideLibraryScrollBar"]
+  local fits = height <= (scroll:GetHeight() or 0)
+  if bar and type(bar) == "table" then bar:SetShown(not fits) end
+  if fits then scroll:SetVerticalScroll(0) end
 end
 
 -- onUse(key) is called after a guide is chosen; onView(key) when one is
@@ -162,6 +180,7 @@ function LibraryView.Refresh(onUse, onView)
       y = place(r, y, ROW_H)
     end
   end
+  fit(y)
   return i
 end
 
